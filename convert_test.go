@@ -1,6 +1,7 @@
 package goval
 
 import (
+	"math"
 	"reflect"
 	"testing"
 )
@@ -35,21 +36,40 @@ func TestToBool(t *testing.T) {
 		{name: "Uint64(false)", args: args{x: Uint64(0)}, want: Bool(false)},
 		{name: "Float32(true)", args: args{x: Float32(123.45)}, want: Bool(true)},
 		{name: "Float32(false)", args: args{x: Float32(0)}, want: Bool(false)},
+		{name: "Float32(Inf)", args: args{x: Float32(float32(math.Inf(0)))}, want: Bool(true)},
+		{name: "Float32(-Inf)", args: args{x: Float32(float32(math.Inf(-1)))}, want: Bool(true)},
+		{name: "Float32(NaN)", args: args{x: Float32(float32(math.NaN()))}, want: Bool(true)},
 		{name: "Float64(true)", args: args{x: Float64(123.45)}, want: Bool(true)},
+		{name: "Float64(Inf)", args: args{x: Float64(math.Inf(0))}, want: Bool(true)},
+		{name: "Float64(-Inf)", args: args{x: Float64(math.Inf(-1))}, want: Bool(true)},
+		{name: "Float64(NaN)", args: args{x: Float64(math.NaN())}, want: Bool(true)},
 		{name: "Float64(false)", args: args{x: Float64(0)}, want: Bool(false)},
-		{name: "String(true)#00", args: args{x: String("1")}, want: Bool(true)},
-		{name: "String(true)#01", args: args{x: String("t")}, want: Bool(true)},
-		{name: "String(true)#02", args: args{x: String("T")}, want: Bool(true)},
-		{name: "String(true)#03", args: args{x: String("TRUE")}, want: Bool(true)},
-		{name: "String(true)#04", args: args{x: String("true")}, want: Bool(true)},
-		{name: "String(true)#05", args: args{x: String("True")}, want: Bool(true)},
-		{name: "String(false)#00", args: args{x: String("0")}, want: Bool(false)},
-		{name: "String(false)#01", args: args{x: String("f")}, want: Bool(false)},
-		{name: "String(false)#02", args: args{x: String("F")}, want: Bool(false)},
-		{name: "String(false)#03", args: args{x: String("FALSE")}, want: Bool(false)},
-		{name: "String(false)#04", args: args{x: String("false")}, want: Bool(false)},
-		{name: "String(false)#05", args: args{x: String("False")}, want: Bool(false)},
+		{name: "String(true)", args: args{x: String("1")}, want: Bool(true)},
+		{name: "String(true)", args: args{x: String("t")}, want: Bool(true)},
+		{name: "String(true)", args: args{x: String("T")}, want: Bool(true)},
+		{name: "String(true)", args: args{x: String("TRUE")}, want: Bool(true)},
+		{name: "String(true)", args: args{x: String("true")}, want: Bool(true)},
+		{name: "String(true)", args: args{x: String("True")}, want: Bool(true)},
+		{name: "String(false)", args: args{x: String("0")}, want: Bool(false)},
+		{name: "String(false)", args: args{x: String("f")}, want: Bool(false)},
+		{name: "String(false)", args: args{x: String("F")}, want: Bool(false)},
+		{name: "String(false)", args: args{x: String("FALSE")}, want: Bool(false)},
+		{name: "String(false)", args: args{x: String("false")}, want: Bool(false)},
+		{name: "String(false)", args: args{x: String("False")}, want: Bool(false)},
 		{name: "String(error)", args: args{x: String("error")}, want: Bool(false)},
+		{name: "Bytes(true)", args: args{x: Bytes([]byte("1"))}, want: Bool(true)},
+		{name: "Bytes(true)", args: args{x: Bytes([]byte("t"))}, want: Bool(true)},
+		{name: "Bytes(true)", args: args{x: Bytes([]byte("T"))}, want: Bool(true)},
+		{name: "Bytes(true)", args: args{x: Bytes([]byte("TRUE"))}, want: Bool(true)},
+		{name: "Bytes(true)", args: args{x: Bytes([]byte("true"))}, want: Bool(true)},
+		{name: "Bytes(true)", args: args{x: Bytes([]byte("True"))}, want: Bool(true)},
+		{name: "Bytes(false)", args: args{x: Bytes([]byte("0"))}, want: Bool(false)},
+		{name: "Bytes(false)", args: args{x: Bytes([]byte("f"))}, want: Bool(false)},
+		{name: "Bytes(false)", args: args{x: Bytes([]byte("F"))}, want: Bool(false)},
+		{name: "Bytes(false)", args: args{x: Bytes([]byte("FALSE"))}, want: Bool(false)},
+		{name: "Bytes(false)", args: args{x: Bytes([]byte("false"))}, want: Bool(false)},
+		{name: "Bytes(false)", args: args{x: Bytes([]byte("False"))}, want: Bool(false)},
+		{name: "Bytes(error)", args: args{x: Bytes([]byte("error"))}, want: Bool(false)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
