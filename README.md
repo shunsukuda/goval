@@ -1,0 +1,2 @@
+# goval
+Go wrapper value
