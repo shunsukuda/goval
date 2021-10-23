@@ -1,8 +1,10 @@
 package goval
 
 import (
+	"errors"
 	"math"
 	"reflect"
+	"strconv"
 	"testing"
 )
 
@@ -84,21 +86,75 @@ func TestToBoolCheck(t *testing.T) {
 	type args struct {
 		x BoolConverter
 	}
-	tests := []struct {
+	type data struct {
 		name  string
 		args  args
 		want  Bool
 		want1 Err
-	}{
-		// TODO: Add test cases.
+	}
+	tests := []data{
+		{name: "Bool(true)", args: args{x: Bool(true)}, want: Bool(true), want1: nil},
+		{name: "Bool(false), want1: nil,", args: args{x: Bool(false)}, want: Bool(false)},
+		{name: "Int8(true), want1: nil,", args: args{x: Int8(-123)}, want: Bool(true)},
+		{name: "Int8(false), want1: nil,", args: args{x: Int8(0)}, want: Bool(false)},
+		{name: "Int16(true), want1: nil,", args: args{x: Int16(-123)}, want: Bool(true)},
+		{name: "Int16(false), want1: nil,", args: args{x: Int16(0)}, want: Bool(false)},
+		{name: "Int32(true), want1: nil,", args: args{x: Int32(-123)}, want: Bool(true)},
+		{name: "Int32(false), want1: nil,", args: args{x: Int32(0)}, want: Bool(false)},
+		{name: "Int64(true), want1: nil,", args: args{x: Int64(-123)}, want: Bool(true)},
+		{name: "Int64(false), want1: nil,", args: args{x: Int64(0)}, want: Bool(false)},
+		{name: "Uint8(true), want1: nil,", args: args{x: Uint8(123)}, want: Bool(true)},
+		{name: "Uint8(false), want1: nil,", args: args{x: Uint8(0)}, want: Bool(false)},
+		{name: "Uint16(true), want1: nil,", args: args{x: Uint16(123)}, want: Bool(true)},
+		{name: "Uint16(false), want1: nil,", args: args{x: Uint16(0)}, want: Bool(false)},
+		{name: "Uint32(true), want1: nil,", args: args{x: Uint32(123)}, want: Bool(true)},
+		{name: "Uint32(false), want1: nil,", args: args{x: Uint32(0)}, want: Bool(false)},
+		{name: "Uint64(true), want1: nil,", args: args{x: Uint64(123)}, want: Bool(true)},
+		{name: "Uint64(false), want1: nil,", args: args{x: Uint64(0)}, want: Bool(false)},
+		{name: "Float32(true), want1: nil,", args: args{x: Float32(123.45)}, want: Bool(true)},
+		{name: "Float32(false), want1: nil,", args: args{x: Float32(0)}, want: Bool(false)},
+		{name: "Float32(Inf)", args: args{x: Float32(float32(math.Inf(0)))}, want: Bool(true), want1: nil},
+		{name: "Float32(-Inf)", args: args{x: Float32(float32(math.Inf(-1)))}, want: Bool(true), want1: nil},
+		{name: "Float32(NaN)", args: args{x: Float32(float32(math.NaN()))}, want: Bool(true), want1: nil},
+		{name: "Float64(true), want1: nil,", args: args{x: Float64(123.45)}, want: Bool(true)},
+		{name: "Float64(Inf)", args: args{x: Float64(math.Inf(0))}, want: Bool(true), want1: nil},
+		{name: "Float64(-Inf)", args: args{x: Float64(math.Inf(-1))}, want: Bool(true), want1: nil},
+		{name: "Float64(NaN)", args: args{x: Float64(math.NaN())}, want: Bool(true), want1: nil},
+		{name: "Float64(false), want1: nil,", args: args{x: Float64(0)}, want: Bool(false)},
+		{name: "String(true), want1: nil,", args: args{x: String("1")}, want: Bool(true)},
+		{name: "String(true), want1: nil,", args: args{x: String("t")}, want: Bool(true)},
+		{name: "String(true), want1: nil,", args: args{x: String("T")}, want: Bool(true)},
+		{name: "String(true), want1: nil,", args: args{x: String("TRUE")}, want: Bool(true)},
+		{name: "String(true), want1: nil,", args: args{x: String("true")}, want: Bool(true)},
+		{name: "String(true), want1: nil,", args: args{x: String("True")}, want: Bool(true)},
+		{name: "String(false), want1: nil,", args: args{x: String("0")}, want: Bool(false)},
+		{name: "String(false), want1: nil,", args: args{x: String("f")}, want: Bool(false)},
+		{name: "String(false), want1: nil,", args: args{x: String("F")}, want: Bool(false)},
+		{name: "String(false), want1: nil,", args: args{x: String("FALSE")}, want: Bool(false)},
+		{name: "String(false), want1: nil,", args: args{x: String("false")}, want: Bool(false)},
+		{name: "String(false), want1: nil,", args: args{x: String("False")}, want: Bool(false)},
+		{name: "String(error)", args: args{x: String("error")}, want: Bool(false), want1: strconv.ErrSyntax},
+		{name: "Bytes(true), want1: nil,", args: args{x: Bytes([]byte("1"))}, want: Bool(true)},
+		{name: "Bytes(true), want1: nil,", args: args{x: Bytes([]byte("t"))}, want: Bool(true)},
+		{name: "Bytes(true), want1: nil,", args: args{x: Bytes([]byte("T"))}, want: Bool(true)},
+		{name: "Bytes(true), want1: nil,", args: args{x: Bytes([]byte("TRUE"))}, want: Bool(true)},
+		{name: "Bytes(true), want1: nil,", args: args{x: Bytes([]byte("true"))}, want: Bool(true)},
+		{name: "Bytes(true), want1: nil,", args: args{x: Bytes([]byte("True"))}, want: Bool(true)},
+		{name: "Bytes(false), want1: nil,", args: args{x: Bytes([]byte("0"))}, want: Bool(false)},
+		{name: "Bytes(false), want1: nil,", args: args{x: Bytes([]byte("f"))}, want: Bool(false)},
+		{name: "Bytes(false), want1: nil,", args: args{x: Bytes([]byte("F"))}, want: Bool(false)},
+		{name: "Bytes(false), want1: nil,", args: args{x: Bytes([]byte("FALSE"))}, want: Bool(false)},
+		{name: "Bytes(false), want1: nil,", args: args{x: Bytes([]byte("false"))}, want: Bool(false)},
+		{name: "Bytes(false), want1: nil,", args: args{x: Bytes([]byte("False"))}, want: Bool(false)},
+		{name: "Bytes(error)", args: args{x: Bytes([]byte("error"))}, want: Bool(false), want1: strconv.ErrSyntax},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, got1 := ToBoolCheck(tt.args.x)
-			if !reflect.DeepEqual(got, tt.want) {
+			if got != tt.want {
 				t.Errorf("ToBoolCheck() got = %v, want %v", got, tt.want)
 			}
-			if !reflect.DeepEqual(got1, tt.want1) {
+			if !errors.Is(got1, tt.want1) {
 				t.Errorf("ToBoolCheck() got1 = %v, want %v", got1, tt.want1)
 			}
 		})
