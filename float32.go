@@ -105,17 +105,17 @@ func (e Float32) ToFloat64Check() (Float64, Err) {
 }
 
 func (e Float32) ToString() String {
-	return String(strconv.FormatFloat(float64(e.Float32()), FloatStringFormat, -1, 32))
+	return String(strconv.FormatFloat(float64(e.Float32()), FloatConvFormat, -1, 32))
 }
 
 func (e Float32) ToStringCheck() (String, Err) {
-	return String(strconv.FormatFloat(float64(e.Float32()), FloatStringFormat, -1, 32)), nil
+	return String(strconv.FormatFloat(float64(e.Float32()), FloatConvFormat, -1, 32)), nil
 }
 
 func (e Float32) ToBytes() Bytes {
-	return Bytes(unsafeStringToBytes(strconv.FormatFloat(float64(e.Float32()), FloatStringFormat, -1, 32)))
+	return Bytes(unsafeStringToBytes(strconv.FormatFloat(float64(e.Float32()), FloatConvFormat, -1, 32)))
 }
 
 func (e Float32) ToBytesCheck() (Bytes, Err) {
-	return Bytes(unsafeStringToBytes(strconv.FormatFloat(float64(e.Float32()), FloatStringFormat, -1, 32))), nil
+	return Bytes(unsafeStringToBytes(strconv.FormatFloat(float64(e.Float32()), FloatConvFormat, -1, 32))), nil
 }

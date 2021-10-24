@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	FloatStringFormat byte = 'f'
+	FloatConvFormat byte = 'f'
 )
 
 type BoolConverter interface {
