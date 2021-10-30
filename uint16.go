@@ -1,6 +1,10 @@
 package goval
 
-import "strconv"
+import (
+	"strconv"
+
+	"github.com/shunsukuda/goval/unsafecast"
+)
 
 type Uint16 uint16
 
@@ -113,9 +117,9 @@ func (e Uint16) ToStringCheck() (String, Err) {
 }
 
 func (e Uint16) ToBytes() Bytes {
-	return Bytes(unsafeStringToBytes(strconv.FormatUint(uint64(e.Uint16()), 10)))
+	return Bytes(unsafecast.StringToBytes(strconv.FormatUint(uint64(e.Uint16()), 10)))
 }
 
 func (e Uint16) ToBytesCheck() (Bytes, Err) {
-	return Bytes(unsafeStringToBytes(strconv.FormatUint(uint64(e.Uint16()), 10))), nil
+	return Bytes(unsafecast.StringToBytes(strconv.FormatUint(uint64(e.Uint16()), 10))), nil
 }

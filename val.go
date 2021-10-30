@@ -23,4 +23,5 @@ const (
 	ValTypeFloat64
 	ValTypeString
 	ValTypeBytes
+	ValTypeTime
 )
