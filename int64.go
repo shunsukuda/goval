@@ -3,7 +3,7 @@ package goval
 import (
 	"strconv"
 
-	"github.com/shunsukuda/goval/unsafecast"
+	"github.com/shunsukuda/goval/forceconv"
 )
 
 type Int64 int64
@@ -117,9 +117,9 @@ func (e Int64) ToStringCheck() (String, Err) {
 }
 
 func (e Int64) ToBytes() Bytes {
-	return Bytes(unsafecast.StringToBytes(strconv.FormatInt(int64(e.Int64()), 10)))
+	return Bytes(forceconv.StringToBytes(strconv.FormatInt(int64(e.Int64()), 10)))
 }
 
 func (e Int64) ToBytesCheck() (Bytes, Err) {
-	return Bytes(unsafecast.StringToBytes(strconv.FormatInt(e.Int64(), 10))), nil
+	return Bytes(forceconv.StringToBytes(strconv.FormatInt(e.Int64(), 10))), nil
 }

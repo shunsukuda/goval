@@ -1,4 +1,4 @@
-package unsafecast
+package forceconv
 
 import (
 	"reflect"

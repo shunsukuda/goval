@@ -3,7 +3,7 @@ package goval
 import (
 	"strconv"
 
-	"github.com/shunsukuda/goval/unsafecast"
+	"github.com/shunsukuda/goval/forceconv"
 )
 
 type Bool bool
@@ -177,9 +177,9 @@ func (e Bool) ToStringCheck() (String, Err) {
 }
 
 func (e Bool) ToBytes() Bytes {
-	return Bytes(unsafecast.StringToBytes(strconv.FormatBool(e.Bool())))
+	return Bytes(forceconv.StringToBytes(strconv.FormatBool(e.Bool())))
 }
 
 func (e Bool) ToBytesCheck() (Bytes, Err) {
-	return Bytes(unsafecast.StringToBytes(strconv.FormatBool(e.Bool()))), nil
+	return Bytes(forceconv.StringToBytes(strconv.FormatBool(e.Bool()))), nil
 }

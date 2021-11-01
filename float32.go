@@ -3,7 +3,7 @@ package goval
 import (
 	"strconv"
 
-	"github.com/shunsukuda/goval/unsafecast"
+	"github.com/shunsukuda/goval/forceconv"
 )
 
 type Float32 float32
@@ -117,9 +117,9 @@ func (e Float32) ToStringCheck() (String, Err) {
 }
 
 func (e Float32) ToBytes() Bytes {
-	return Bytes(unsafecast.StringToBytes(strconv.FormatFloat(float64(e.Float32()), FloatConvFormat, -1, 32)))
+	return Bytes(forceconv.StringToBytes(strconv.FormatFloat(float64(e.Float32()), FloatConvFormat, -1, 32)))
 }
 
 func (e Float32) ToBytesCheck() (Bytes, Err) {
-	return Bytes(unsafecast.StringToBytes(strconv.FormatFloat(float64(e.Float32()), FloatConvFormat, -1, 32))), nil
+	return Bytes(forceconv.StringToBytes(strconv.FormatFloat(float64(e.Float32()), FloatConvFormat, -1, 32))), nil
 }

@@ -3,7 +3,7 @@ package goval
 import (
 	"fmt"
 
-	"github.com/shunsukuda/goval/unsafecast"
+	"github.com/shunsukuda/goval/forceconv"
 )
 
 var (
@@ -113,7 +113,7 @@ func ToBool(x BoolConverter) Bool {
 			}
 			return Bool(false)
 		case Bytes:
-			cv, err := strconv.ParseBool(unsafecast.BytesToString(cx.Bytes()))
+			cv, err := strconv.ParseBool(forceconv.BytesToString(cx.Bytes()))
 			if err == nil {
 				return Bool(cv)
 			}
@@ -164,7 +164,7 @@ func ToInt8(x Int8Converter) Int8 {
 			}
 			return Int8(0)
 		case Bytes:
-			cv, err := strconv.ParseInt(unsafecast.BytesToString(cx.Bytes()), 0, 0)
+			cv, err := strconv.ParseInt(forceconv.BytesToString(cx.Bytes()), 0, 0)
 			if err == nil {
 				return Int8(cv)
 			}
@@ -215,7 +215,7 @@ func ToInt16(x Int16Converter) Int16 {
 			}
 			return Int16(0)
 		case Bytes:
-			cv, err := strconv.ParseInt(unsafecast.BytesToString(cx.Bytes()), 0, 0)
+			cv, err := strconv.ParseInt(forceconv.BytesToString(cx.Bytes()), 0, 0)
 			if err == nil {
 				return Int16(cv)
 			}
@@ -266,7 +266,7 @@ func ToInt32(x Int32Converter) Int32 {
 			}
 			return Int32(0)
 		case Bytes:
-			cv, err := strconv.ParseInt(unsafecast.BytesToString(cx.Bytes()), 0, 0)
+			cv, err := strconv.ParseInt(forceconv.BytesToString(cx.Bytes()), 0, 0)
 			if err == nil {
 				return Int32(cv)
 			}
@@ -317,7 +317,7 @@ func ToInt64(x Int64Converter) Int64 {
 			}
 			return Int64(0)
 		case Bytes:
-			cv, err := strconv.ParseInt(unsafecast.BytesToString(cx.Bytes()), 0, 0)
+			cv, err := strconv.ParseInt(forceconv.BytesToString(cx.Bytes()), 0, 0)
 			if err == nil {
 				return Int64(cv)
 			}
@@ -368,7 +368,7 @@ func ToUint8(x Uint8Converter) Uint8 {
 			}
 			return Uint8(0)
 		case Bytes:
-			cv, err := strconv.ParseInt(unsafecast.BytesToString(cx.Bytes()), 0, 0)
+			cv, err := strconv.ParseInt(forceconv.BytesToString(cx.Bytes()), 0, 0)
 			if err == nil {
 				return Uint8(cv)
 			}
@@ -419,7 +419,7 @@ func ToUint16(x Uint16Converter) Uint16 {
 			}
 			return Uint16(0)
 		case Bytes:
-			cv, err := strconv.ParseInt(unsafecast.BytesToString(cx.Bytes()), 0, 0)
+			cv, err := strconv.ParseInt(forceconv.BytesToString(cx.Bytes()), 0, 0)
 			if err == nil {
 				return Uint16(cv)
 			}
@@ -470,7 +470,7 @@ func ToUint32(x Uint32Converter) Uint32 {
 			}
 			return Uint32(0)
 		case Bytes:
-			cv, err := strconv.ParseInt(unsafecast.BytesToString(cx.Bytes()), 0, 0)
+			cv, err := strconv.ParseInt(forceconv.BytesToString(cx.Bytes()), 0, 0)
 			if err == nil {
 				return Uint32(cv)
 			}
@@ -521,7 +521,7 @@ func ToUint64(x Uint64Converter) Uint64 {
 			}
 			return Uint64(0)
 		case Bytes:
-			cv, err := strconv.ParseInt(unsafecast.BytesToString(cx.Bytes()), 0, 0)
+			cv, err := strconv.ParseInt(forceconv.BytesToString(cx.Bytes()), 0, 0)
 			if err == nil {
 				return Uint64(cv)
 			}
@@ -572,7 +572,7 @@ func ToFloat32(x Float32Converter) Float32 {
 			}
 			return Float32(0.0)
 		case Bytes:
-			cv, err := strconv.ParseInt(unsafecast.BytesToString(cx.Bytes()), 0, 0)
+			cv, err := strconv.ParseInt(forceconv.BytesToString(cx.Bytes()), 0, 0)
 			if err == nil {
 				return Float32(cv)
 			}
@@ -623,7 +623,7 @@ func ToFloat64(x Float64Converter) Float64 {
 			}
 			return Float64(0.0)
 		case Bytes:
-			cv, err := strconv.ParseInt(unsafecast.BytesToString(cx.Bytes()), 0, 0)
+			cv, err := strconv.ParseInt(forceconv.BytesToString(cx.Bytes()), 0, 0)
 			if err == nil {
 				return Float64(cv)
 			}
@@ -667,7 +667,7 @@ func ToString(x StringConverter) String {
 		case String:
 			return cx
 		case Bytes:
-			return String(unsafecast.BytesToString(cx.Bytes()))
+			return String(forceconv.BytesToString(cx.Bytes()))
 		default:
 			return String("")
 		}
@@ -685,7 +685,7 @@ func ToBytes(x BytesConverter) Bytes {
 		case Bytes:
 			return cx
 		default:
-			return Bytes(unsafecast.StringToBytes(ToString(cx).String()))
+			return Bytes(forceconv.StringToBytes(ToString(cx).String()))
 		}
 	*/
 }
@@ -699,5 +699,5 @@ func ToStringFormat(x Val, format string) String {
 }
 
 func ToBytesFormat(x Val, format string) Bytes {
-	return Bytes(unsafecast.StringToBytes(fmt.Sprintf(format, x.Interface())))
+	return Bytes(forceconv.StringToBytes(fmt.Sprintf(format, x.Interface())))
 }
