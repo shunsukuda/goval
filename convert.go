@@ -3,6 +3,7 @@ package goval
 import (
 	"fmt"
 
+	"github.com/apache/arrow/go/arrow"
 	"github.com/shunsukuda/goval/forceconv"
 )
 
@@ -78,6 +79,18 @@ type BytesConverter interface {
 type TimeConverter interface {
 	ToTime() Time
 	ToTimeCheck() (Time, Err)
+}
+
+type ArrowTimeConverter interface {
+	ToArrowDayTimeInterval() arrow.DayTimeInterval
+	ToArrowDuration() arrow.Duration
+	ToArrowMonthdayNanoInterval() arrow.MonthDayNanoInterval
+	ToArrowMonthInterval() arrow.MonthInterval
+	ToArrowTimestamp() arrow.Timestamp
+	ToArrowDate32() arrow.Date32
+	ToArrowDate64() arrow.Date64
+	ToArrowTime32() arrow.Time32
+	ToArrowTime64() arrow.Time64
 }
 
 func ToBool(x BoolConverter) Bool {

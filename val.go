@@ -1,12 +1,21 @@
 package goval
 
+import "database/sql/driver"
+
 // Warper
 type Val interface {
 	Interface() interface{}
 	Type() Type
+
+	// Value implementation driver.Valuer interface.
+	Value() (driver.Value, error)
+
+	// Scan implementation sql.Scanner interface.
+	Scan(src interface{}) error
 }
 
-type Type int
+type Type interface {
+}
 
 const (
 	ValTypeNil = iota
@@ -24,4 +33,6 @@ const (
 	ValTypeString
 	ValTypeBytes
 	ValTypeTime
+	ValTypeDate32
+	ValTypeDate64
 )

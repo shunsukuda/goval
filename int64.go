@@ -1,12 +1,17 @@
 package goval
 
 import (
+	"database/sql/driver"
 	"strconv"
 
 	"github.com/shunsukuda/goval/forceconv"
 )
 
 type Int64 int64
+
+func NewInt64(x int64) Int64 {
+	return Int64(x)
+}
 
 func (e Int64) Int64() int64 {
 	return int64(e)
@@ -18,6 +23,19 @@ func (e Int64) Interface() interface{} {
 
 func (e Int64) Type() Type {
 	return ValTypeInt64
+}
+
+func (e Int64) Value() (driver.Value, error) {
+	return driver.Value(e.Int64()), nil
+}
+
+func (e *Int64) Scan(src interface{}) error {
+	val, err := scanVal(src)
+	if val != nil && err != nil {
+		*e = val.(Int64Converter).ToInt64()
+		return nil
+	}
+	return err
 }
 
 func (e Int64) ToBool() Bool {

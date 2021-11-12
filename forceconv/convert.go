@@ -22,6 +22,7 @@ func StringToBytes(s string) []byte {
 		}))
 }
 
+/*
 func Int8ToUint8(v int8) uint8 {
 	return *(*uint8)(unsafe.Pointer(&v))
 }
@@ -53,3 +54,4 @@ func Int64ToUint64(v int64) uint64 {
 func Uint64ToInt64(v uint64) int64 {
 	return *(*int64)(unsafe.Pointer(&v))
 }
+*/
