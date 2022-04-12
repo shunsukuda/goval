@@ -1,5 +1,6 @@
 package decimal
 
+/*
 import (
 	"math"
 	"math/big"
@@ -265,3 +266,4 @@ func (e NumBits) ToDecimal(exp int32) Decimal {
 		exp: exp,
 	}
 }
+*/

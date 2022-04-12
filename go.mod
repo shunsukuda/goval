@@ -1,6 +1,6 @@
 module github.com/shunsukuda/goval
 
-go 1.17
+go 1.18
 
 replace github.com/shunsukuda/goval/decimal => ./decimal
 

@@ -1,5 +1,6 @@
 package decimal
 
+/*
 import (
 	"bytes"
 	"fmt"
@@ -395,8 +396,15 @@ func (e Decimal) RoundAway(p int32) Decimal {
 }
 
 func (e Decimal) roundRem(p int32) (Decimal, int) {
-	a := e.SetExp(p - 1).val
-	a, r := new(big.Int).QuoRem(a, bigV10, new(big.Int))
+	var a big.Int
+	var r int
+	if p < e.exp {
+
+		a = *e.SetExp(p - 1).val
+		a, r = a.QuoRem(a, bigV10, new(big.Int))
+	} else {
+
+	}
 
 	return Decimal{
 		val: a,
@@ -515,3 +523,4 @@ func (e Decimal) Quo(x Decimal) Decimal {
 func (e Decimal) String() string {
 	return e.val.Text(10) + "e" + strconv.FormatInt(int64(e.exp), 10)
 }
+*/
