@@ -6,7 +6,125 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"text/template"
+)
+
+type tmplTypeInfo struct {
+	TypeName   string
+	GoTypeName string
+	TypeKind   string
+	RefKind    string
+	ZeroValue  string
+	BitSize    int
+	Sizeof     int
+}
+
+type tmplConfNumeric struct {
+	To                    []tmplTypeInfo
+	From                  []tmplTypeInfo
+	StrconvIntBaseName    string
+	StrconvIntBaseValue   string
+	StrconvUintBaseName   string
+	StrconvUintBaseValue  string
+	StrconvFloatFmtName   string
+	StrconvFloatFmtValue  string
+	StrconvFloatPrecName  string
+	StrconvFloatPrecValue string
+}
+
+type tmplConfString struct {
+	To   []tmplTypeInfo
+	From []tmplTypeInfo
+}
+
+type tmplConfTypeInfoList struct {
+	TL []tmplTypeInfo
+}
+
+type tmplConfType struct {
+	T []tmplTypeInfo
+}
+
+var (
+	typeInfoListNumeric = []tmplTypeInfo{
+		{TypeName: "Int8", GoTypeName: "int8", TypeKind: "Int", BitSize: 8},
+		{TypeName: "Int16", GoTypeName: "int16", TypeKind: "Int", BitSize: 16},
+		{TypeName: "Int32", GoTypeName: "int32", TypeKind: "Int", BitSize: 32},
+		{TypeName: "Int64", GoTypeName: "int64", TypeKind: "Int", BitSize: 64},
+		{TypeName: "Uint8", GoTypeName: "uint8", TypeKind: "Uint", BitSize: 8},
+		{TypeName: "Uint16", GoTypeName: "uint16", TypeKind: "Uint", BitSize: 16},
+		{TypeName: "Uint32", GoTypeName: "uint32", TypeKind: "Uint", BitSize: 32},
+		{TypeName: "Uint64", GoTypeName: "uint64", TypeKind: "Uint", BitSize: 64},
+		{TypeName: "Float32", GoTypeName: "float32", TypeKind: "Float", BitSize: 32},
+		{TypeName: "Float64", GoTypeName: "float64", TypeKind: "Float", BitSize: 64},
+		{TypeName: "Complex64", GoTypeName: "complex64", TypeKind: "Complex", BitSize: 32},
+		{TypeName: "Complex128", GoTypeName: "complex128", TypeKind: "Complex", BitSize: 64},
+	}
+	typeInfoListString = []tmplTypeInfo{
+		{TypeName: "String", GoTypeName: "string", TypeKind: "String"},
+		{TypeName: "Bytes", GoTypeName: "[]byte", TypeKind: "Bytes"},
+	}
+	typeInfoListAll = []tmplTypeInfo{
+		{TypeName: "Nil", GoTypeName: "nil", TypeKind: "Nil", RefKind: "Invalid", BitSize: 0},
+		{TypeName: "Bool", GoTypeName: "bool", TypeKind: "Bool", RefKind: "Bool", BitSize: 1},
+		{TypeName: "Int8", GoTypeName: "int8", TypeKind: "Int", RefKind: "", BitSize: 8},
+		{TypeName: "Int16", GoTypeName: "int16", TypeKind: "Int", RefKind: "", BitSize: 16},
+		{TypeName: "Int32", GoTypeName: "int32", TypeKind: "Int", RefKind: "", BitSize: 32},
+		{TypeName: "Int64", GoTypeName: "int64", TypeKind: "Int", RefKind: "", BitSize: 64},
+		{TypeName: "Uint8", GoTypeName: "uint8", TypeKind: "Uint", RefKind: "", BitSize: 8},
+		{TypeName: "Uint16", GoTypeName: "uint16", TypeKind: "Uint", RefKind: "", BitSize: 16},
+		{TypeName: "Uint32", GoTypeName: "uint32", TypeKind: "Uint", RefKind: "", BitSize: 32},
+		{TypeName: "Uint64", GoTypeName: "uint64", TypeKind: "Uint", RefKind: "", BitSize: 64},
+		{TypeName: "Float32", GoTypeName: "float32", TypeKind: "Float", RefKind: "", BitSize: 32},
+		{TypeName: "Float64", GoTypeName: "float64", TypeKind: "Float", RefKind: "", BitSize: 64},
+		{TypeName: "Complex64", GoTypeName: "complex64", TypeKind: "Complex", RefKind: "", BitSize: 64},
+		{TypeName: "Complex128", GoTypeName: "complex128", TypeKind: "Complex", RefKind: "", BitSize: 128},
+		{TypeName: "String", GoTypeName: "string", TypeKind: "String", RefKind: "", BitSize: 0},
+		{TypeName: "Bytes", GoTypeName: "[]byte", TypeKind: "Bytes", RefKind: "Slice", BitSize: 0},
+	}
+
+	typeInfoListForceconv = []tmplTypeInfo{
+		{TypeName: "Bool", GoTypeName: "bool", TypeKind: "Bool", ZeroValue: "false", Sizeof: 1},
+		{TypeName: "Int8", GoTypeName: "int8", TypeKind: "Int", ZeroValue: "0", Sizeof: 1},
+		{TypeName: "Int16", GoTypeName: "int16", TypeKind: "Int", ZeroValue: "0", Sizeof: 2},
+		{TypeName: "Int32", GoTypeName: "int32", TypeKind: "Int", ZeroValue: "0", Sizeof: 4},
+		{TypeName: "Int64", GoTypeName: "int64", TypeKind: "Int", ZeroValue: "0", Sizeof: 8},
+		{TypeName: "Uint8", GoTypeName: "uint8", TypeKind: "Uint", ZeroValue: "0", Sizeof: 1},
+		{TypeName: "Uint16", GoTypeName: "uint16", TypeKind: "Uint", ZeroValue: "0", Sizeof: 2},
+		{TypeName: "Uint32", GoTypeName: "uint32", TypeKind: "Uint", ZeroValue: "0", Sizeof: 4},
+		{TypeName: "Uint64", GoTypeName: "uint64", TypeKind: "Uint", ZeroValue: "0", Sizeof: 8},
+		{TypeName: "Float32", GoTypeName: "float32", TypeKind: "Float", ZeroValue: "0.0", Sizeof: 4},
+		{TypeName: "Float64", GoTypeName: "float64", TypeKind: "Float", ZeroValue: "0.0", Sizeof: 8},
+		{TypeName: "Complex64", GoTypeName: "complex64", TypeKind: "Complex", ZeroValue: "0", Sizeof: 4},
+		{TypeName: "Complex128", GoTypeName: "complex128", TypeKind: "Complex", ZeroValue: "0", Sizeof: 8},
+	}
+
+	tmplDataNumeric = tmplConfNumeric{
+		To:                    typeInfoListNumeric,
+		From:                  typeInfoListNumeric,
+		StrconvIntBaseName:    "IntToStringBase",
+		StrconvIntBaseValue:   "10",
+		StrconvUintBaseName:   "UintToStringBase",
+		StrconvUintBaseValue:  "16",
+		StrconvFloatFmtName:   "FloatToStringFmt",
+		StrconvFloatFmtValue:  "'g'",
+		StrconvFloatPrecName:  "FloatToStringPrec",
+		StrconvFloatPrecValue: "-1",
+	}
+	tmplDataString = tmplConfString{
+		To:   typeInfoListNumeric,
+		From: typeInfoListString,
+	}
+	tmplDataGeneral = tmplConfTypeInfoList{
+		TL: typeInfoListNumeric,
+	}
+	tmplDataType = tmplConfType{
+		T: typeInfoListAll,
+	}
+	tmplDataForceconv = tmplConfTypeInfoList{
+		TL: typeInfoListForceconv,
+	}
 )
 
 type tmplSet struct {
@@ -22,7 +140,7 @@ func main() {
 		{Name: "String", Input: "tmpl_string.go", Output: "string.gen.go", Config: tmplDataString},
 		{Name: "Bool", Input: "tmpl_bool.go", Output: "bool.gen.go", Config: tmplDataGeneral},
 		{Name: "Type", Input: "tmpl_type.go", Output: "type.gen.go", Config: tmplDataType},
-		{Name: "Forceconv", Input: "tmpl_forceconv.go", Output: "forceconv/forceconv.gen.go", Config: tmplDataGeneral},
+		{Name: "Forceconv", Input: "tmpl_forceconv.go", Output: "forceconv/forceconv.gen.go", Config: tmplDataForceconv},
 	}
 
 	PROJECT_PATH := os.Getenv("GOPATH") + "/src/github.com/shunsukuda/goval/"
@@ -44,6 +162,9 @@ func main() {
 		outFile, _ := os.Create(outputPath)
 		defer outFile.Close()
 		if err = tmpl.Execute(outFile, set[i].Config); err != nil {
+			log.Fatal(err)
+		}
+		if err = exec.Command("go", "fmt", outputPath).Start(); err != nil {
 			log.Fatal(err)
 		}
 	}
