@@ -3,7 +3,7 @@ package goval
 import (
 	"strconv"
 
-	"github.com/shunsukuda/goval/forceconv"
+	"github.com/shunsukuda/forceconv"
 )
 
 type String string

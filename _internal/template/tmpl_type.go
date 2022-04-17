@@ -2,16 +2,16 @@ package goval
 
 import "reflect"
 
-const ({{range $T := $.T}}
+const ({{range $T := $.TL}}
 	Type{{$T.TypeName}}{{if eq $T.TypeName "Nil"}} = iota{{end}}
 	{{- end}}{{/* range $T */}}
 )
 
 var (
-	ValTypes = struct { {{range $T := $.T}}
+	ValTypes = struct { {{range $T := $.TL}}
 		{{$T.TypeName}} Type
 		{{- end}}{{/* range $T */}}
-	}{ {{range $T := $.T}}
+	}{ {{range $T := $.TL}}
 		{{$T.TypeName}}: &{{$T.TypeName}}Type{},
 	{{- end}}{{/* range $T */}}
 	}
@@ -25,7 +25,7 @@ type Type interface {
 	// BitSize() int
 }
 
-{{range $T := $.T}}
+{{range $T := $.TL}}
 type {{$T.TypeName}}Type struct{}
 
 func (t {{$T.TypeName}}Type) ID() int { return Type{{$T.TypeName}} }

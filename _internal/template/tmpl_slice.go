@@ -14,6 +14,8 @@ type ValSlice interface {
 
 type {{$T.TypeName}}Slice []{{$T.GoTypeName}}
 
+func New{{$T.TypeName}}Slice(s []{{$T.GoTypeName}}) {{$T.TypeName}}Slice { return s }
+
 func (s *{{$T.TypeName}}Slice) Interface() interface{} { return s.{{$T.TypeName}}Slice() }
 func (s *{{$T.TypeName}}Slice) {{$T.TypeName}}Slice() []{{$T.GoTypeName}} { return *s }
 func (s *{{$T.TypeName}}Slice) Type() Type { return ValTypes.{{$T.TypeName}} }

@@ -73,6 +73,10 @@ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZN
 github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4/go.mod h1:xMI15A0UPsDsEKsMN9yxemIoYk6Tm2C1GtYGdfGttqA=
 github.com/rogpeppe/fastuuid v1.2.0/go.mod h1:jVj6XXZzXRy/MSR5jhDC/2q6DgLz+nrA6LYCDYWNEvQ=
 github.com/ruudk/golang-pdf417 v0.0.0-20181029194003-1af4ab5afa58/go.mod h1:6lfFZQK844Gfx8o5WFuvpxWRwnSoipWe/p622j1v06w=
+github.com/shunsukuda/forceconv v0.0.0-20220417085755-b32bdc5ca5c7 h1:q1IEIZLPKWuyx83XCfQnNhHwCv5xnXMjFif0uoJ5Dho=
+github.com/shunsukuda/forceconv v0.0.0-20220417085755-b32bdc5ca5c7/go.mod h1:2hwATmDRjPA1LXXXdDMqpJbkvvhjBUK7HQi0ZNMIcGQ=
+github.com/shunsukuda/goval/forceconv v0.0.0-20220417062824-5d8326c13349 h1:wmKLwnyGNVX21SFXTlEEFYD/bASrJDpE5v3ahqtpC5w=
+github.com/shunsukuda/goval/forceconv v0.0.0-20220417062824-5d8326c13349/go.mod h1:ncMmxhdPZVLNNGTs7P7N52P78G4OinMmyisXO6WIeiI=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
