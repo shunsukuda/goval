@@ -23,6 +23,7 @@ const (
 	SizeofComplex128 = int(unsafe.Sizeof(complex128(0)))
 )
 
+// Bytes to Bool Slice force convert.
 func BytesToBool(b []byte) []goval.Bool {
 	if b == nil {
 		return nil
@@ -35,6 +36,7 @@ func BytesToBool(b []byte) []goval.Bool {
 	}))
 }
 
+// Bool Slice to Bytes force convert.
 func BoolsToBytes(s []bool) []byte {
 	if s == nil {
 		return nil
@@ -47,6 +49,7 @@ func BoolsToBytes(s []bool) []byte {
 	}))
 }
 
+// Bytes to Int8 Slice force convert.
 func BytesToInt8(b []byte) []goval.Int8 {
 	if b == nil {
 		return nil
@@ -59,6 +62,7 @@ func BytesToInt8(b []byte) []goval.Int8 {
 	}))
 }
 
+// Int8 Slice to Bytes force convert.
 func Int8sToBytes(s []int8) []byte {
 	if s == nil {
 		return nil
@@ -71,6 +75,7 @@ func Int8sToBytes(s []int8) []byte {
 	}))
 }
 
+// Bytes to Int16 Slice force convert.
 func BytesToInt16(b []byte) []goval.Int16 {
 	if b == nil {
 		return nil
@@ -89,6 +94,7 @@ func BytesToInt16(b []byte) []goval.Int16 {
 	}))
 }
 
+// Int16 Slice to Bytes force convert.
 func Int16sToBytes(s []int16) []byte {
 	if s == nil {
 		return nil
@@ -101,6 +107,7 @@ func Int16sToBytes(s []int16) []byte {
 	}))
 }
 
+// Bytes to Int32 Slice force convert.
 func BytesToInt32(b []byte) []goval.Int32 {
 	if b == nil {
 		return nil
@@ -119,6 +126,7 @@ func BytesToInt32(b []byte) []goval.Int32 {
 	}))
 }
 
+// Int32 Slice to Bytes force convert.
 func Int32sToBytes(s []int32) []byte {
 	if s == nil {
 		return nil
@@ -131,6 +139,7 @@ func Int32sToBytes(s []int32) []byte {
 	}))
 }
 
+// Bytes to Int64 Slice force convert.
 func BytesToInt64(b []byte) []goval.Int64 {
 	if b == nil {
 		return nil
@@ -149,6 +158,7 @@ func BytesToInt64(b []byte) []goval.Int64 {
 	}))
 }
 
+// Int64 Slice to Bytes force convert.
 func Int64sToBytes(s []int64) []byte {
 	if s == nil {
 		return nil
@@ -161,6 +171,7 @@ func Int64sToBytes(s []int64) []byte {
 	}))
 }
 
+// Bytes to Uint8 Slice force convert.
 func BytesToUint8(b []byte) []goval.Uint8 {
 	if b == nil {
 		return nil
@@ -173,6 +184,7 @@ func BytesToUint8(b []byte) []goval.Uint8 {
 	}))
 }
 
+// Uint8 Slice to Bytes force convert.
 func Uint8sToBytes(s []uint8) []byte {
 	if s == nil {
 		return nil
@@ -185,6 +197,7 @@ func Uint8sToBytes(s []uint8) []byte {
 	}))
 }
 
+// Bytes to Uint16 Slice force convert.
 func BytesToUint16(b []byte) []goval.Uint16 {
 	if b == nil {
 		return nil
@@ -203,6 +216,7 @@ func BytesToUint16(b []byte) []goval.Uint16 {
 	}))
 }
 
+// Uint16 Slice to Bytes force convert.
 func Uint16sToBytes(s []uint16) []byte {
 	if s == nil {
 		return nil
@@ -215,6 +229,7 @@ func Uint16sToBytes(s []uint16) []byte {
 	}))
 }
 
+// Bytes to Uint32 Slice force convert.
 func BytesToUint32(b []byte) []goval.Uint32 {
 	if b == nil {
 		return nil
@@ -233,6 +248,7 @@ func BytesToUint32(b []byte) []goval.Uint32 {
 	}))
 }
 
+// Uint32 Slice to Bytes force convert.
 func Uint32sToBytes(s []uint32) []byte {
 	if s == nil {
 		return nil
@@ -245,6 +261,7 @@ func Uint32sToBytes(s []uint32) []byte {
 	}))
 }
 
+// Bytes to Uint64 Slice force convert.
 func BytesToUint64(b []byte) []goval.Uint64 {
 	if b == nil {
 		return nil
@@ -263,6 +280,7 @@ func BytesToUint64(b []byte) []goval.Uint64 {
 	}))
 }
 
+// Uint64 Slice to Bytes force convert.
 func Uint64sToBytes(s []uint64) []byte {
 	if s == nil {
 		return nil
@@ -275,6 +293,7 @@ func Uint64sToBytes(s []uint64) []byte {
 	}))
 }
 
+// Bytes to Float32 Slice force convert.
 func BytesToFloat32(b []byte) []goval.Float32 {
 	if b == nil {
 		return nil
@@ -293,6 +312,7 @@ func BytesToFloat32(b []byte) []goval.Float32 {
 	}))
 }
 
+// Float32 Slice to Bytes force convert.
 func Float32sToBytes(s []float32) []byte {
 	if s == nil {
 		return nil
@@ -305,6 +325,7 @@ func Float32sToBytes(s []float32) []byte {
 	}))
 }
 
+// Bytes to Float64 Slice force convert.
 func BytesToFloat64(b []byte) []goval.Float64 {
 	if b == nil {
 		return nil
@@ -323,6 +344,7 @@ func BytesToFloat64(b []byte) []goval.Float64 {
 	}))
 }
 
+// Float64 Slice to Bytes force convert.
 func Float64sToBytes(s []float64) []byte {
 	if s == nil {
 		return nil
@@ -335,6 +357,7 @@ func Float64sToBytes(s []float64) []byte {
 	}))
 }
 
+// Bytes to Complex64 Slice force convert.
 func BytesToComplex64(b []byte) []goval.Complex64 {
 	if b == nil {
 		return nil
@@ -353,6 +376,7 @@ func BytesToComplex64(b []byte) []goval.Complex64 {
 	}))
 }
 
+// Complex64 Slice to Bytes force convert.
 func Complex64sToBytes(s []complex64) []byte {
 	if s == nil {
 		return nil
@@ -365,6 +389,7 @@ func Complex64sToBytes(s []complex64) []byte {
 	}))
 }
 
+// Bytes to Complex128 Slice force convert.
 func BytesToComplex128(b []byte) []goval.Complex128 {
 	if b == nil {
 		return nil
@@ -383,6 +408,7 @@ func BytesToComplex128(b []byte) []goval.Complex128 {
 	}))
 }
 
+// Complex128 Slice to Bytes force convert.
 func Complex128sToBytes(s []complex128) []byte {
 	if s == nil {
 		return nil
@@ -395,6 +421,7 @@ func Complex128sToBytes(s []complex128) []byte {
 	}))
 }
 
+// Bytes to String force convert.
 func BytesToString(b []byte) string {
 	return *(*string)(unsafe.Pointer(
 		&reflect.StringHeader{
@@ -403,6 +430,7 @@ func BytesToString(b []byte) string {
 		}))
 }
 
+// String to Bytes force convert.
 func StringToBytes(s string) []byte {
 	return *(*[]byte)(unsafe.Pointer(
 		&reflect.SliceHeader{

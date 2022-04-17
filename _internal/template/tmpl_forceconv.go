@@ -16,6 +16,7 @@ const (
 )
 
 {{range $T := $.TL -}}
+// Bytes to {{$T.TypeName}} Slice force convert.
 func BytesTo{{$T.TypeName}}(b []byte) []goval.{{$T.TypeName}} {
 	if b == nil {
 		return nil
@@ -35,6 +36,7 @@ func BytesTo{{$T.TypeName}}(b []byte) []goval.{{$T.TypeName}} {
 	}))
 }
 
+// {{$T.TypeName}} Slice to Bytes force convert.
 func {{$T.TypeName}}sToBytes(s []{{$T.GoTypeName}}) []byte {
 	if s == nil {
 		return nil
@@ -49,6 +51,7 @@ func {{$T.TypeName}}sToBytes(s []{{$T.GoTypeName}}) []byte {
 
 {{end}}
 
+// Bytes to String force convert.
 func BytesToString(b []byte) string {
 	return *(*string)(unsafe.Pointer(
 		&reflect.StringHeader{
@@ -57,6 +60,7 @@ func BytesToString(b []byte) string {
 		}))
 }
 
+// String to Bytes force convert.
 func StringToBytes(s string) []byte {
 	return *(*[]byte)(unsafe.Pointer(
 		&reflect.SliceHeader{
