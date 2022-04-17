@@ -84,6 +84,23 @@ var (
 		{TypeName: "Bytes", GoTypeName: "[]byte", TypeKind: "Bytes", RefKind: "Slice", BitSize: 0},
 	}
 
+	typeInfoListSlice = []tmplTypeInfo{
+		{TypeName: "Bool", GoTypeName: "bool", TypeKind: "Bool", RefKind: "Bool", BitSize: 1},
+		{TypeName: "Int8", GoTypeName: "int8", TypeKind: "Int", RefKind: "", BitSize: 8},
+		{TypeName: "Int16", GoTypeName: "int16", TypeKind: "Int", RefKind: "", BitSize: 16},
+		{TypeName: "Int32", GoTypeName: "int32", TypeKind: "Int", RefKind: "", BitSize: 32},
+		{TypeName: "Int64", GoTypeName: "int64", TypeKind: "Int", RefKind: "", BitSize: 64},
+		{TypeName: "Uint8", GoTypeName: "uint8", TypeKind: "Uint", RefKind: "", BitSize: 8},
+		{TypeName: "Uint16", GoTypeName: "uint16", TypeKind: "Uint", RefKind: "", BitSize: 16},
+		{TypeName: "Uint32", GoTypeName: "uint32", TypeKind: "Uint", RefKind: "", BitSize: 32},
+		{TypeName: "Uint64", GoTypeName: "uint64", TypeKind: "Uint", RefKind: "", BitSize: 64},
+		{TypeName: "Float32", GoTypeName: "float32", TypeKind: "Float", RefKind: "", BitSize: 32},
+		{TypeName: "Float64", GoTypeName: "float64", TypeKind: "Float", RefKind: "", BitSize: 64},
+		{TypeName: "Complex64", GoTypeName: "complex64", TypeKind: "Complex", RefKind: "", BitSize: 64},
+		{TypeName: "Complex128", GoTypeName: "complex128", TypeKind: "Complex", RefKind: "", BitSize: 128},
+		{TypeName: "String", GoTypeName: "string", TypeKind: "String", RefKind: "", BitSize: 0},
+	}
+
 	typeInfoListForceconv = []tmplTypeInfo{
 		{TypeName: "Bool", GoTypeName: "bool", TypeKind: "Bool", ZeroValue: "false", Sizeof: 1},
 		{TypeName: "Int8", GoTypeName: "int8", TypeKind: "Int", ZeroValue: "0", Sizeof: 1},
@@ -122,6 +139,9 @@ var (
 	tmplDataType = tmplConfType{
 		T: typeInfoListAll,
 	}
+	tmplDataSlice = tmplConfTypeInfoList{
+		TL: typeInfoListSlice,
+	}
 	tmplDataForceconv = tmplConfTypeInfoList{
 		TL: typeInfoListForceconv,
 	}
@@ -140,6 +160,7 @@ func main() {
 		{Name: "String", Input: "tmpl_string.go", Output: "string.gen.go", Config: tmplDataString},
 		{Name: "Bool", Input: "tmpl_bool.go", Output: "bool.gen.go", Config: tmplDataGeneral},
 		{Name: "Type", Input: "tmpl_type.go", Output: "type.gen.go", Config: tmplDataType},
+		{Name: "Slice", Input: "tmpl_slice.go", Output: "slice.gen.go", Config: tmplDataSlice},
 		{Name: "Forceconv", Input: "tmpl_forceconv.go", Output: "forceconv/forceconv.gen.go", Config: tmplDataForceconv},
 	}
 
