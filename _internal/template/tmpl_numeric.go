@@ -38,6 +38,7 @@ func (e {{$From.TypeName}}) {{$From.TypeName}}() {{$From.GoTypeName}} { return {
 func (e {{$From.TypeName}}) Interface() interface{} { return e.{{$From.TypeName}}() }
 func (e {{$From.TypeName}}) Val() Val { return e }
 func (e {{$From.TypeName}}) Type() Type { return ValTypes.{{$From.TypeName}} }
+func (e {{$From.TypeName}}) Value()  { return ValTypes.{{$From.TypeName}} }
 
 {{range $To := $.To -}}
 func (e {{$From.TypeName}}) To{{$To.TypeName}}() {{$To.TypeName}} { return {{if eq $From.TypeName $To.TypeName}}e
