@@ -1,7 +1,6 @@
-package gobig
+package goval
 
-import "math/big"
-
+/*
 type BigInt big.Int
 
 func NewBigInt() BigInt {
@@ -10,8 +9,8 @@ func NewBigInt() BigInt {
 }
 
 func newInt() *big.Int {
-	var z BigInt
-	return *z
+	var z big.Int
+	return &z
 }
 
 func (e BigInt) BigInt() *big.Int {
@@ -57,7 +56,7 @@ func (e BigInt) Bytes() []byte {
 
 func (e BigInt) Cmp(x *BigInt) (r int) {
 	r = e.BigInt().Cmp(x.BigInt())
-	return
+	return r
 }
 
 func (e BigInt) CmpAbs(x *BigInt) int {
@@ -70,7 +69,8 @@ func (e BigInt) Div(x *BigInt) *BigInt {
 	return &a
 }
 
-func (e BigInt) DivMod(x, m *BigInt) *BigInt {
+func (e BigInt) DivMod(x, m *BigInt) (*BigInt, *BigInt) {
 	a, b := newInt().DivMod(e.BigInt(), x.BigInt(), m.BigInt())
-	return &BigInt(a), &BigInt(b)
+	return &BigInt(*a), &BigInt(*b)
 }
+*/

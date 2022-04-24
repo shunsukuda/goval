@@ -6,9 +6,6 @@ type Val interface {
 	Val() Val
 	Type() Type
 
-	// Value implementation driver.Valuer interface.
-	//Value() (driver.Value, error)
-
-	// Scan implementation sql.Scanner interface.
-	//Scan(src interface{}) error
+	// Value() (driver.Value, error) // implement database.sql.driver.Valuer
+	// Scan(value interface{}) error // implement database.sql.Scanner
 }

@@ -1,10 +1,10 @@
-package time
+package goval
 
+/*
 import (
 	"time"
 
 	"github.com/apache/arrow/go/arrow"
-	. "github.com/shunsukuda/goval"
 )
 
 const (
@@ -86,3 +86,4 @@ func (e Time) ArrowTypeDurationType(tu arrow.TimeUnit) arrow.DurationType {
 		Unit: tu,
 	}
 }
+*/

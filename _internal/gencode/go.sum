@@ -1,0 +1,4 @@
+github.com/shunsukuda/forceconv v0.0.0-20220420160239-6a8ba2d3d6e2 h1:KO1uTjjo8dB/XAq1VCxKtxqe5eLq6vnfStvv1bD3X5g=
+github.com/shunsukuda/forceconv v0.0.0-20220420160239-6a8ba2d3d6e2/go.mod h1:2hwATmDRjPA1LXXXdDMqpJbkvvhjBUK7HQi0ZNMIcGQ=
+github.com/shunsukuda/go-gencode v1.0.5 h1:pgW5zplIJtrjHMbZSt9BiQkOtRGon3s8KyLJ1MjSQ5M=
+github.com/shunsukuda/go-gencode v1.0.5/go.mod h1:a20keKVHwFFaWNKjiMnanzZM0eUEXgQLAJTzHuy8IXg=

@@ -1,13 +1,9 @@
 package main
 
 import (
-	"bytes"
-	"fmt"
-	"io"
-	"log"
 	"os"
-	"os/exec"
-	"text/template"
+
+	"github.com/shunsukuda/go-gencode"
 )
 
 type tmplTypeInfo struct {
@@ -141,29 +137,13 @@ func main() {
 	}
 
 	PROJECT_PATH := os.Getenv("GOPATH") + "/src/github.com/shunsukuda/goval/"
-	TEMPLATE_DIR := PROJECT_PATH + "_internal/template/"
+	TEMPLATE_DIR := PROJECT_PATH + "_internal/gencode/"
+	gencode.DoGoFmt = true
 
 	for i := range set {
-		fmt.Printf("generate code: %s\n", set[i].Name)
-		inputPath := TEMPLATE_DIR + set[i].Input
-		outputPath := PROJECT_PATH + set[i].Output
-		tmplFile, _ := os.Open(inputPath)
-		defer tmplFile.Close()
-		tmplBuf := bytes.NewBuffer(nil)
-		io.Copy(tmplBuf, tmplFile)
-		fmt.Printf("input %s %d bytes\n", inputPath, tmplBuf.Len())
-		tmpl, err := template.New(set[i].Name).Parse(tmplBuf.String())
-		if err != nil {
-			log.Fatal(err)
-		}
-		outFile, _ := os.Create(outputPath)
-		defer outFile.Close()
-		if err = tmpl.Execute(outFile, set[i].Config); err != nil {
-			log.Fatal(err)
-		}
-		if err = exec.Command("go", "fmt", outputPath).Start(); err != nil {
-			log.Fatal(err)
-		}
+		set[i].Input = TEMPLATE_DIR + set[i].Input
+		set[i].Output = PROJECT_PATH + set[i].Output
+		gencode.GenCode(set[i].Name, set[i].Input, set[i].Output, set[i].Config)
 	}
 
 }

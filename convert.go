@@ -4,8 +4,32 @@ import (
 	"fmt"
 
 	"github.com/apache/arrow/go/arrow"
-	"github.com/shunsukuda/goval/forceconv"
+	"github.com/shunsukuda/forceconv"
 )
+
+type IntConverter interface {
+	Int8Converter
+	Int16Converter
+	Int32Converter
+	Int64Converter
+}
+
+type UintConverter interface {
+	Uint8Converter
+	Uint16Converter
+	Uint32Converter
+	Uint64Converter
+}
+
+type FloatConverter interface {
+	Float32Converter
+	Float64Converter
+}
+
+type ComplexConverter interface {
+	Complex64Converter
+	Complex128Converter
+}
 
 type BoolConverter interface {
 	ToBool() Bool
@@ -62,6 +86,16 @@ type Float64Converter interface {
 	ToFloat64Eq() (Float64, bool)
 }
 
+type Complex64Converter interface {
+	ToComplex64() Complex64
+	ToComplex64Eq() (Complex64, bool)
+}
+
+type Complex128Converter interface {
+	ToComplex128() Complex128
+	ToComplex128Eq() (Complex128, bool)
+}
+
 type StringConverter interface {
 	ToString() String
 	ToStringCheck() (String, bool)
@@ -72,10 +106,12 @@ type BytesConverter interface {
 	ToBytesCheck() (Bytes, bool)
 }
 
+/*
 type TimeConverter interface {
 	ToTime() Time
 	ToTimeCheck() (Time, bool)
 }
+*/
 
 type ArrowTimeConverter interface {
 	ToArrowDayTimeInterval() arrow.DayTimeInterval
@@ -198,9 +234,9 @@ func ToBytesEq(x BytesConverter) (Bytes, bool) {
 */
 
 func ToStringFormat(x Val, format string) String {
-	return String(fmt.Sprintf(format, x.Interface()))
+	return String{fmt.Sprintf(format, x.Interface())}
 }
 
 func ToBytesFormat(x Val, format string) Bytes {
-	return Bytes(forceconv.StringToBytes(fmt.Sprintf(format, x.Interface())))
+	return Bytes{forceconv.StringToBytes(fmt.Sprintf(format, x.Interface()))}
 }
