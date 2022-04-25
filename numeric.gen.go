@@ -46,12 +46,13 @@ type Int8 struct {
 	Int8 int8
 }
 
-func (e Int8) GoInt8() int8           { return e.Int8 }
-func (e Int8) Interface() interface{} { return e.Int8 }
-func (e Int8) Val() Val               { return e }
-func (e Int8) Type() Type             { return ValTypes.Int8 }
-func (e Int8) Equal(x Int8) bool      { return e.Int8 == x.Int8 }
+func (e Int8) GoInt8() int8      { return e.Int8 }
+func (e Int8) Type() Type        { return ValTypes.Int8 }
+func (e Int8) Equal(x Int8) bool { return e.Int8 == x.Int8 }
 
+func (e Int8) ToBool() Bool {
+	return Bool{e.Int8 != 0}
+}
 func (e Int8) ToInt8() Int8 {
 	return e
 }
@@ -124,26 +125,34 @@ func (e Int8) ToComplex128() Complex128 {
 func (e Int8) ToComplex128Eq() (Complex128, bool) {
 	return e.ToComplex128(), true
 }
-func (e Int8) ToBool() Bool {
-	return Bool{e.Int8 != 0}
-}
+
 func (e Int8) ToString() String {
 	return String{strconv.FormatInt(e.ToInt64().Int64, IntToStringBase)}
 }
+
 func (e Int8) ToBytes() Bytes {
 	return Bytes{forceconv.StringToBytes(e.ToString().String)}
+}
+
+func (e Int8) ToStringBase(base int) String {
+	return String{strconv.FormatInt(e.ToInt64().Int64, base)}
+}
+
+func (e Int8) ToBytesBase(base int) Bytes {
+	return Bytes{forceconv.StringToBytes(e.ToStringBase(base).String)}
 }
 
 type Int16 struct {
 	Int16 int16
 }
 
-func (e Int16) GoInt16() int16         { return e.Int16 }
-func (e Int16) Interface() interface{} { return e.Int16 }
-func (e Int16) Val() Val               { return e }
-func (e Int16) Type() Type             { return ValTypes.Int16 }
-func (e Int16) Equal(x Int16) bool     { return e.Int16 == x.Int16 }
+func (e Int16) GoInt16() int16     { return e.Int16 }
+func (e Int16) Type() Type         { return ValTypes.Int16 }
+func (e Int16) Equal(x Int16) bool { return e.Int16 == x.Int16 }
 
+func (e Int16) ToBool() Bool {
+	return Bool{e.Int16 != 0}
+}
 func (e Int16) ToInt8() Int8 {
 	return Int8{int8(e.Int16)}
 }
@@ -216,26 +225,34 @@ func (e Int16) ToComplex128() Complex128 {
 func (e Int16) ToComplex128Eq() (Complex128, bool) {
 	return e.ToComplex128(), true
 }
-func (e Int16) ToBool() Bool {
-	return Bool{e.Int16 != 0}
-}
+
 func (e Int16) ToString() String {
 	return String{strconv.FormatInt(e.ToInt64().Int64, IntToStringBase)}
 }
+
 func (e Int16) ToBytes() Bytes {
 	return Bytes{forceconv.StringToBytes(e.ToString().String)}
+}
+
+func (e Int16) ToStringBase(base int) String {
+	return String{strconv.FormatInt(e.ToInt64().Int64, base)}
+}
+
+func (e Int16) ToBytesBase(base int) Bytes {
+	return Bytes{forceconv.StringToBytes(e.ToStringBase(base).String)}
 }
 
 type Int32 struct {
 	Int32 int32
 }
 
-func (e Int32) GoInt32() int32         { return e.Int32 }
-func (e Int32) Interface() interface{} { return e.Int32 }
-func (e Int32) Val() Val               { return e }
-func (e Int32) Type() Type             { return ValTypes.Int32 }
-func (e Int32) Equal(x Int32) bool     { return e.Int32 == x.Int32 }
+func (e Int32) GoInt32() int32     { return e.Int32 }
+func (e Int32) Type() Type         { return ValTypes.Int32 }
+func (e Int32) Equal(x Int32) bool { return e.Int32 == x.Int32 }
 
+func (e Int32) ToBool() Bool {
+	return Bool{e.Int32 != 0}
+}
 func (e Int32) ToInt8() Int8 {
 	return Int8{int8(e.Int32)}
 }
@@ -308,26 +325,34 @@ func (e Int32) ToComplex128() Complex128 {
 func (e Int32) ToComplex128Eq() (Complex128, bool) {
 	return e.ToComplex128(), true
 }
-func (e Int32) ToBool() Bool {
-	return Bool{e.Int32 != 0}
-}
+
 func (e Int32) ToString() String {
 	return String{strconv.FormatInt(e.ToInt64().Int64, IntToStringBase)}
 }
+
 func (e Int32) ToBytes() Bytes {
 	return Bytes{forceconv.StringToBytes(e.ToString().String)}
+}
+
+func (e Int32) ToStringBase(base int) String {
+	return String{strconv.FormatInt(e.ToInt64().Int64, base)}
+}
+
+func (e Int32) ToBytesBase(base int) Bytes {
+	return Bytes{forceconv.StringToBytes(e.ToStringBase(base).String)}
 }
 
 type Int64 struct {
 	Int64 int64
 }
 
-func (e Int64) GoInt64() int64         { return e.Int64 }
-func (e Int64) Interface() interface{} { return e.Int64 }
-func (e Int64) Val() Val               { return e }
-func (e Int64) Type() Type             { return ValTypes.Int64 }
-func (e Int64) Equal(x Int64) bool     { return e.Int64 == x.Int64 }
+func (e Int64) GoInt64() int64     { return e.Int64 }
+func (e Int64) Type() Type         { return ValTypes.Int64 }
+func (e Int64) Equal(x Int64) bool { return e.Int64 == x.Int64 }
 
+func (e Int64) ToBool() Bool {
+	return Bool{e.Int64 != 0}
+}
 func (e Int64) ToInt8() Int8 {
 	return Int8{int8(e.Int64)}
 }
@@ -400,26 +425,34 @@ func (e Int64) ToComplex128() Complex128 {
 func (e Int64) ToComplex128Eq() (Complex128, bool) {
 	return e.ToComplex128(), e == e.ToComplex128().ToInt64()
 }
-func (e Int64) ToBool() Bool {
-	return Bool{e.Int64 != 0}
-}
+
 func (e Int64) ToString() String {
 	return String{strconv.FormatInt(e.Int64, IntToStringBase)}
 }
+
 func (e Int64) ToBytes() Bytes {
 	return Bytes{forceconv.StringToBytes(e.ToString().String)}
+}
+
+func (e Int64) ToStringBase(base int) String {
+	return String{strconv.FormatInt(e.Int64, base)}
+}
+
+func (e Int64) ToBytesBase(base int) Bytes {
+	return Bytes{forceconv.StringToBytes(e.ToStringBase(base).String)}
 }
 
 type Uint8 struct {
 	Uint8 uint8
 }
 
-func (e Uint8) GoUint8() uint8         { return e.Uint8 }
-func (e Uint8) Interface() interface{} { return e.Uint8 }
-func (e Uint8) Val() Val               { return e }
-func (e Uint8) Type() Type             { return ValTypes.Uint8 }
-func (e Uint8) Equal(x Uint8) bool     { return e.Uint8 == x.Uint8 }
+func (e Uint8) GoUint8() uint8     { return e.Uint8 }
+func (e Uint8) Type() Type         { return ValTypes.Uint8 }
+func (e Uint8) Equal(x Uint8) bool { return e.Uint8 == x.Uint8 }
 
+func (e Uint8) ToBool() Bool {
+	return Bool{e.Uint8 != 0}
+}
 func (e Uint8) ToInt8() Int8 {
 	return Int8{int8(e.Uint8)}
 }
@@ -492,26 +525,34 @@ func (e Uint8) ToComplex128() Complex128 {
 func (e Uint8) ToComplex128Eq() (Complex128, bool) {
 	return e.ToComplex128(), true
 }
-func (e Uint8) ToBool() Bool {
-	return Bool{e.Uint8 != 0}
-}
+
 func (e Uint8) ToString() String {
 	return String{strconv.FormatUint(e.ToUint64().Uint64, UintToStringBase)}
 }
+
 func (e Uint8) ToBytes() Bytes {
 	return Bytes{forceconv.StringToBytes(e.ToString().String)}
+}
+
+func (e Uint8) ToStringBase(base int) String {
+	return String{strconv.FormatUint(e.ToUint64().Uint64, base)}
+}
+
+func (e Uint8) ToBytesBase(base int) Bytes {
+	return Bytes{forceconv.StringToBytes(e.ToStringBase(base).String)}
 }
 
 type Uint16 struct {
 	Uint16 uint16
 }
 
-func (e Uint16) GoUint16() uint16       { return e.Uint16 }
-func (e Uint16) Interface() interface{} { return e.Uint16 }
-func (e Uint16) Val() Val               { return e }
-func (e Uint16) Type() Type             { return ValTypes.Uint16 }
-func (e Uint16) Equal(x Uint16) bool    { return e.Uint16 == x.Uint16 }
+func (e Uint16) GoUint16() uint16    { return e.Uint16 }
+func (e Uint16) Type() Type          { return ValTypes.Uint16 }
+func (e Uint16) Equal(x Uint16) bool { return e.Uint16 == x.Uint16 }
 
+func (e Uint16) ToBool() Bool {
+	return Bool{e.Uint16 != 0}
+}
 func (e Uint16) ToInt8() Int8 {
 	return Int8{int8(e.Uint16)}
 }
@@ -584,26 +625,34 @@ func (e Uint16) ToComplex128() Complex128 {
 func (e Uint16) ToComplex128Eq() (Complex128, bool) {
 	return e.ToComplex128(), true
 }
-func (e Uint16) ToBool() Bool {
-	return Bool{e.Uint16 != 0}
-}
+
 func (e Uint16) ToString() String {
 	return String{strconv.FormatUint(e.ToUint64().Uint64, UintToStringBase)}
 }
+
 func (e Uint16) ToBytes() Bytes {
 	return Bytes{forceconv.StringToBytes(e.ToString().String)}
+}
+
+func (e Uint16) ToStringBase(base int) String {
+	return String{strconv.FormatUint(e.ToUint64().Uint64, base)}
+}
+
+func (e Uint16) ToBytesBase(base int) Bytes {
+	return Bytes{forceconv.StringToBytes(e.ToStringBase(base).String)}
 }
 
 type Uint32 struct {
 	Uint32 uint32
 }
 
-func (e Uint32) GoUint32() uint32       { return e.Uint32 }
-func (e Uint32) Interface() interface{} { return e.Uint32 }
-func (e Uint32) Val() Val               { return e }
-func (e Uint32) Type() Type             { return ValTypes.Uint32 }
-func (e Uint32) Equal(x Uint32) bool    { return e.Uint32 == x.Uint32 }
+func (e Uint32) GoUint32() uint32    { return e.Uint32 }
+func (e Uint32) Type() Type          { return ValTypes.Uint32 }
+func (e Uint32) Equal(x Uint32) bool { return e.Uint32 == x.Uint32 }
 
+func (e Uint32) ToBool() Bool {
+	return Bool{e.Uint32 != 0}
+}
 func (e Uint32) ToInt8() Int8 {
 	return Int8{int8(e.Uint32)}
 }
@@ -656,7 +705,7 @@ func (e Uint32) ToFloat32() Float32 {
 	return Float32{float32(e.Uint32)}
 }
 func (e Uint32) ToFloat32Eq() (Float32, bool) {
-	return e.ToFloat32(), 0 <= e.Uint32 && e.Uint32 <= uint32(maxInt24)
+	return e.ToFloat32(), e.Uint32 <= uint32(maxInt24)
 }
 func (e Uint32) ToFloat64() Float64 {
 	return Float64{float64(e.Uint32)}
@@ -676,26 +725,34 @@ func (e Uint32) ToComplex128() Complex128 {
 func (e Uint32) ToComplex128Eq() (Complex128, bool) {
 	return e.ToComplex128(), true
 }
-func (e Uint32) ToBool() Bool {
-	return Bool{e.Uint32 != 0}
-}
+
 func (e Uint32) ToString() String {
 	return String{strconv.FormatUint(e.ToUint64().Uint64, UintToStringBase)}
 }
+
 func (e Uint32) ToBytes() Bytes {
 	return Bytes{forceconv.StringToBytes(e.ToString().String)}
+}
+
+func (e Uint32) ToStringBase(base int) String {
+	return String{strconv.FormatUint(e.ToUint64().Uint64, base)}
+}
+
+func (e Uint32) ToBytesBase(base int) Bytes {
+	return Bytes{forceconv.StringToBytes(e.ToStringBase(base).String)}
 }
 
 type Uint64 struct {
 	Uint64 uint64
 }
 
-func (e Uint64) GoUint64() uint64       { return e.Uint64 }
-func (e Uint64) Interface() interface{} { return e.Uint64 }
-func (e Uint64) Val() Val               { return e }
-func (e Uint64) Type() Type             { return ValTypes.Uint64 }
-func (e Uint64) Equal(x Uint64) bool    { return e.Uint64 == x.Uint64 }
+func (e Uint64) GoUint64() uint64    { return e.Uint64 }
+func (e Uint64) Type() Type          { return ValTypes.Uint64 }
+func (e Uint64) Equal(x Uint64) bool { return e.Uint64 == x.Uint64 }
 
+func (e Uint64) ToBool() Bool {
+	return Bool{e.Uint64 != 0}
+}
 func (e Uint64) ToInt8() Int8 {
 	return Int8{int8(e.Uint64)}
 }
@@ -748,13 +805,13 @@ func (e Uint64) ToFloat32() Float32 {
 	return Float32{float32(e.Uint64)}
 }
 func (e Uint64) ToFloat32Eq() (Float32, bool) {
-	return e.ToFloat32(), 0 <= e.Uint64 && e.Uint64 <= uint64(maxInt53)
+	return e.ToFloat32(), e.Uint64 <= uint64(maxInt53)
 }
 func (e Uint64) ToFloat64() Float64 {
 	return Float64{float64(e.Uint64)}
 }
 func (e Uint64) ToFloat64Eq() (Float64, bool) {
-	return e.ToFloat64(), 0 <= e.Uint64 && e.Uint64 <= uint64(maxInt53)
+	return e.ToFloat64(), e.Uint64 <= uint64(maxInt53)
 }
 func (e Uint64) ToComplex64() Complex64 {
 	return Complex64{complex(e.ToFloat32().Float32, float32(0))}
@@ -768,26 +825,34 @@ func (e Uint64) ToComplex128() Complex128 {
 func (e Uint64) ToComplex128Eq() (Complex128, bool) {
 	return e.ToComplex128(), e == e.ToComplex128().ToUint64()
 }
-func (e Uint64) ToBool() Bool {
-	return Bool{e.Uint64 != 0}
-}
+
 func (e Uint64) ToString() String {
 	return String{strconv.FormatUint(e.Uint64, UintToStringBase)}
 }
+
 func (e Uint64) ToBytes() Bytes {
 	return Bytes{forceconv.StringToBytes(e.ToString().String)}
+}
+
+func (e Uint64) ToStringBase(base int) String {
+	return String{strconv.FormatUint(e.Uint64, base)}
+}
+
+func (e Uint64) ToBytesBase(base int) Bytes {
+	return Bytes{forceconv.StringToBytes(e.ToStringBase(base).String)}
 }
 
 type Float32 struct {
 	Float32 float32
 }
 
-func (e Float32) GoFloat32() float32     { return e.Float32 }
-func (e Float32) Interface() interface{} { return e.Float32 }
-func (e Float32) Val() Val               { return e }
-func (e Float32) Type() Type             { return ValTypes.Float32 }
-func (e Float32) Equal(x Float32) bool   { return e.Float32 == x.Float32 }
+func (e Float32) GoFloat32() float32   { return e.Float32 }
+func (e Float32) Type() Type           { return ValTypes.Float32 }
+func (e Float32) Equal(x Float32) bool { return e.Float32 == x.Float32 }
 
+func (e Float32) ToBool() Bool {
+	return Bool{e.Float32 != 0}
+}
 func (e Float32) ToInt8() Int8 {
 	return Int8{int8(e.Float32)}
 }
@@ -860,26 +925,50 @@ func (e Float32) ToComplex128() Complex128 {
 func (e Float32) ToComplex128Eq() (Complex128, bool) {
 	return e.ToComplex128(), e == e.ToComplex128().ToFloat32()
 }
-func (e Float32) ToBool() Bool {
-	return Bool{e.Float32 != 0}
-}
+
 func (e Float32) ToString() String {
 	return String{strconv.FormatFloat(e.ToFloat64().Float64, FloatToStringFmt, FloatToStringPrec, 32)}
 }
+
 func (e Float32) ToBytes() Bytes {
 	return Bytes{forceconv.StringToBytes(e.ToString().String)}
+}
+
+func (e Float32) ToStringFmt(fmt byte) String {
+	return String{strconv.FormatFloat(e.ToFloat64().Float64, fmt, FloatToStringPrec, 32)}
+}
+
+func (e Float32) ToBytesFmt(fmt byte) Bytes {
+	return Bytes{forceconv.StringToBytes(e.ToStringFmt(fmt).String)}
+}
+
+func (e Float32) ToStringPrec(prec int) String {
+	return String{strconv.FormatFloat(e.ToFloat64().Float64, FloatToStringFmt, prec, 32)}
+}
+
+func (e Float32) ToBytesPrec(prec int) Bytes {
+	return Bytes{forceconv.StringToBytes(e.ToStringPrec(prec).String)}
+}
+
+func (e Float32) ToStringFmtPrec(fmt byte, prec int) String {
+	return String{strconv.FormatFloat(e.ToFloat64().Float64, fmt, prec, 32)}
+}
+
+func (e Float32) ToBytesFmtPrec(fmt byte, prec int) Bytes {
+	return Bytes{forceconv.StringToBytes(e.ToStringFmtPrec(fmt, prec).String)}
 }
 
 type Float64 struct {
 	Float64 float64
 }
 
-func (e Float64) GoFloat64() float64     { return e.Float64 }
-func (e Float64) Interface() interface{} { return e.Float64 }
-func (e Float64) Val() Val               { return e }
-func (e Float64) Type() Type             { return ValTypes.Float64 }
-func (e Float64) Equal(x Float64) bool   { return e.Float64 == x.Float64 }
+func (e Float64) GoFloat64() float64   { return e.Float64 }
+func (e Float64) Type() Type           { return ValTypes.Float64 }
+func (e Float64) Equal(x Float64) bool { return e.Float64 == x.Float64 }
 
+func (e Float64) ToBool() Bool {
+	return Bool{e.Float64 != 0}
+}
 func (e Float64) ToInt8() Int8 {
 	return Int8{int8(e.Float64)}
 }
@@ -952,14 +1041,37 @@ func (e Float64) ToComplex128() Complex128 {
 func (e Float64) ToComplex128Eq() (Complex128, bool) {
 	return e.ToComplex128(), e.ToString() == e.ToComplex128().ToString()
 }
-func (e Float64) ToBool() Bool {
-	return Bool{e.Float64 != 0}
-}
+
 func (e Float64) ToString() String {
 	return String{strconv.FormatFloat(e.Float64, FloatToStringFmt, FloatToStringPrec, 64)}
 }
+
 func (e Float64) ToBytes() Bytes {
 	return Bytes{forceconv.StringToBytes(e.ToString().String)}
+}
+
+func (e Float64) ToStringFmt(fmt byte) String {
+	return String{strconv.FormatFloat(e.Float64, fmt, FloatToStringPrec, 64)}
+}
+
+func (e Float64) ToBytesFmt(fmt byte) Bytes {
+	return Bytes{forceconv.StringToBytes(e.ToStringFmt(fmt).String)}
+}
+
+func (e Float64) ToStringPrec(prec int) String {
+	return String{strconv.FormatFloat(e.Float64, FloatToStringFmt, prec, 64)}
+}
+
+func (e Float64) ToBytesPrec(prec int) Bytes {
+	return Bytes{forceconv.StringToBytes(e.ToStringPrec(prec).String)}
+}
+
+func (e Float64) ToStringFmtPrec(fmt byte, prec int) String {
+	return String{strconv.FormatFloat(e.Float64, fmt, prec, 64)}
+}
+
+func (e Float64) ToBytesFmtPrec(fmt byte, prec int) Bytes {
+	return Bytes{forceconv.StringToBytes(e.ToStringFmtPrec(fmt, prec).String)}
 }
 
 type Complex64 struct {
@@ -967,11 +1079,12 @@ type Complex64 struct {
 }
 
 func (e Complex64) GoComplex64() complex64 { return e.Complex64 }
-func (e Complex64) Interface() interface{} { return e.Complex64 }
-func (e Complex64) Val() Val               { return e }
 func (e Complex64) Type() Type             { return ValTypes.Complex64 }
 func (e Complex64) Equal(x Complex64) bool { return e.Complex64 == x.Complex64 }
 
+func (e Complex64) ToBool() Bool {
+	return Bool{e.Complex64 != 0}
+}
 func (e Complex64) ToInt8() Int8 {
 	return Int8{int8(real(e.Complex64))}
 }
@@ -1044,14 +1157,37 @@ func (e Complex64) ToComplex128() Complex128 {
 func (e Complex64) ToComplex128Eq() (Complex128, bool) {
 	return e.ToComplex128(), e == e.ToComplex128().ToComplex64()
 }
-func (e Complex64) ToBool() Bool {
-	return Bool{e.Complex64 != 0}
-}
+
 func (e Complex64) ToString() String {
 	return String{strconv.FormatComplex(e.ToComplex128().Complex128, FloatToStringFmt, FloatToStringPrec, 128)}
 }
+
 func (e Complex64) ToBytes() Bytes {
 	return Bytes{forceconv.StringToBytes(e.ToString().String)}
+}
+
+func (e Complex64) ToStringFmt(fmt byte) String {
+	return String{strconv.FormatComplex(e.ToComplex128().Complex128, fmt, FloatToStringPrec, 128)}
+}
+
+func (e Complex64) ToBytesFmt(fmt byte) Bytes {
+	return Bytes{forceconv.StringToBytes(e.ToStringFmt(fmt).String)}
+}
+
+func (e Complex64) ToStringPrec(prec int) String {
+	return String{strconv.FormatComplex(e.ToComplex128().Complex128, FloatToStringFmt, prec, 128)}
+}
+
+func (e Complex64) ToBytesPrec(prec int) Bytes {
+	return Bytes{forceconv.StringToBytes(e.ToStringPrec(prec).String)}
+}
+
+func (e Complex64) ToStringFmtPrec(fmt byte, prec int) String {
+	return String{strconv.FormatComplex(e.ToComplex128().Complex128, fmt, prec, 128)}
+}
+
+func (e Complex64) ToBytesFmtPrec(fmt byte, prec int) Bytes {
+	return Bytes{forceconv.StringToBytes(e.ToStringFmtPrec(fmt, prec).String)}
 }
 
 type Complex128 struct {
@@ -1059,11 +1195,12 @@ type Complex128 struct {
 }
 
 func (e Complex128) GoComplex128() complex128 { return e.Complex128 }
-func (e Complex128) Interface() interface{}   { return e.Complex128 }
-func (e Complex128) Val() Val                 { return e }
 func (e Complex128) Type() Type               { return ValTypes.Complex128 }
 func (e Complex128) Equal(x Complex128) bool  { return e.Complex128 == x.Complex128 }
 
+func (e Complex128) ToBool() Bool {
+	return Bool{e.Complex128 != 0}
+}
 func (e Complex128) ToInt8() Int8 {
 	return Int8{int8(real(e.Complex128))}
 }
@@ -1136,12 +1273,35 @@ func (e Complex128) ToComplex128() Complex128 {
 func (e Complex128) ToComplex128Eq() (Complex128, bool) {
 	return e, true
 }
-func (e Complex128) ToBool() Bool {
-	return Bool{e.Complex128 != 0}
-}
+
 func (e Complex128) ToString() String {
 	return String{strconv.FormatComplex(e.Complex128, FloatToStringFmt, FloatToStringPrec, 128)}
 }
+
 func (e Complex128) ToBytes() Bytes {
 	return Bytes{forceconv.StringToBytes(e.ToString().String)}
+}
+
+func (e Complex128) ToStringFmt(fmt byte) String {
+	return String{strconv.FormatComplex(e.Complex128, fmt, FloatToStringPrec, 128)}
+}
+
+func (e Complex128) ToBytesFmt(fmt byte) Bytes {
+	return Bytes{forceconv.StringToBytes(e.ToStringFmt(fmt).String)}
+}
+
+func (e Complex128) ToStringPrec(prec int) String {
+	return String{strconv.FormatComplex(e.Complex128, FloatToStringFmt, prec, 128)}
+}
+
+func (e Complex128) ToBytesPrec(prec int) Bytes {
+	return Bytes{forceconv.StringToBytes(e.ToStringPrec(prec).String)}
+}
+
+func (e Complex128) ToStringFmtPrec(fmt byte, prec int) String {
+	return String{strconv.FormatComplex(e.Complex128, fmt, prec, 128)}
+}
+
+func (e Complex128) ToBytesFmtPrec(fmt byte, prec int) Bytes {
+	return Bytes{forceconv.StringToBytes(e.ToStringFmtPrec(fmt, prec).String)}
 }

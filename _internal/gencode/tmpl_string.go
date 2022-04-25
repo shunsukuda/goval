@@ -13,8 +13,6 @@ type {{$From.TypeName}} struct {
 }
 
 func (e {{$From.TypeName}}) Go{{$From.TypeName}}() {{$From.GoTypeName}} { return e.{{$From.TypeName}} }
-func (e {{$From.TypeName}}) Interface() interface{} { return e.{{$From.TypeName}} }
-func (e {{$From.TypeName}}) Val() Val { return e }
 func (e {{$From.TypeName}}) Type() Type { return ValTypes.{{$From.TypeName}} }
 {{range $To := $.To}}
 func (e {{$From.TypeName}}) To{{$To.TypeName}}() {{$To.TypeName}} {
@@ -22,7 +20,8 @@ func (e {{$From.TypeName}}) To{{$To.TypeName}}() {{$To.TypeName}} {
 	ce, _ := strconv.Parse{{$To.TypeKind}}(e.String, 0{{if or (eq $To.TypeKind "Int") (eq $To.TypeKind "Uint")}}, {{$To.BitSize}}{{end}})
 	return {{$To.TypeName}}{ {{$To.GoTypeName}}(ce) }
 	{{- else}}return e.ToString().To{{$To.TypeName}}(){{end}}
-} {{end}} {{- /* range $To */}}
+}
+{{end}} {{- /* range $To */}}
 func (e {{$From.TypeName}}) ToBool() Bool { {{if eq $From.TypeName "String"}}
 	ce, _ := strconv.ParseBool(e.String)
 	return Bool{ce}

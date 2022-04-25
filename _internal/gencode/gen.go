@@ -19,6 +19,7 @@ type tmplTypeInfo struct {
 type tmplConfNumeric struct {
 	To                    []tmplTypeInfo
 	From                  []tmplTypeInfo
+	ToStringFuncs         []string
 	StrconvIntBaseName    string
 	StrconvIntBaseValue   string
 	StrconvUintBaseName   string
@@ -96,6 +97,7 @@ var (
 	tmplDataNumeric = tmplConfNumeric{
 		To:                    typeInfoListNumeric,
 		From:                  typeInfoListNumeric,
+		ToStringFuncs:         []string{"", "Base", "Fmt", "Prec", "FmtPrec"},
 		StrconvIntBaseName:    "IntToStringBase",
 		StrconvIntBaseValue:   "10",
 		StrconvUintBaseName:   "UintToStringBase",

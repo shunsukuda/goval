@@ -42,17 +42,17 @@ var (
 	{{$.StrconvFloatPrecName}} int = {{$.StrconvFloatPrecValue}}
 )
 {{range $From := $.From}}
-
 type {{$From.TypeName}} struct{
 	{{$From.TypeName}} {{$From.GoTypeName}}
 }
 
 func (e {{$From.TypeName}}) Go{{$From.TypeName}}() {{$From.GoTypeName}} { return e.{{$From.TypeName}} }
-func (e {{$From.TypeName}}) Interface() interface{} { return e.{{$From.TypeName}} }
-func (e {{$From.TypeName}}) Val() Val { return e }
 func (e {{$From.TypeName}}) Type() Type { return ValTypes.{{$From.TypeName}} }
 func (e {{$From.TypeName}}) Equal(x {{$From.TypeName}}) bool { return e.{{$From.TypeName}} == x.{{$From.TypeName}} }
 
+func (e {{$From.TypeName}}) ToBool() Bool {
+	return Bool{e.{{$From.TypeName}} != 0}
+}
 {{range $To := $.To -}}
 func (e {{$From.TypeName}}) To{{$To.TypeName}}() {{$To.TypeName}} {
 	return {{if eq $From.TypeName $To.TypeName}}e
@@ -88,7 +88,7 @@ func (e {{$From.TypeName}}) To{{$To.TypeName}}Eq() ({{$To.TypeName}}, bool) {
 				{{- end}}
 			{{- else if eq $From.TypeKind "Uint"}}
 				{{- if lt $From.BitSize $To.BitSize}} true
-				{{- else}} 0 <= e.{{$From.TypeName}} && e.{{$From.TypeName}} <= {{$From.GoTypeName}}(maxInt{{if eq $From.BitSize 32}}24{{else}}53{{end}})
+				{{- else}} e.{{$From.TypeName}} <= {{$From.GoTypeName}}(maxInt{{if eq $From.BitSize 32}}24{{else}}53{{end}})
 				{{- end}}
 			{{- else if or (eq $From.TypeKind "Float") (eq $From.TypeKind "Complex")}}
 				{{- if lt $From.BitSize $To.BitSize}} e == e.To{{$To.TypeName}}().To{{$From.TypeName}}()
@@ -105,25 +105,50 @@ func (e {{$From.TypeName}}) To{{$To.TypeName}}Eq() ({{$To.TypeName}}, bool) {
 	{{- end}}
 }
 {{end}} {{- /* range $To */ -}}
-func (e {{$From.TypeName}}) ToBool() Bool {
-	return Bool{e.{{$From.TypeName}} != 0}
-}
-func (e {{$From.TypeName}}) ToString() String {
+{{range $Opt := $.ToStringFuncs}}
+{{- if or
+	(eq $Opt "")
+	(and (eq $Opt "Base") (or (eq $From.TypeKind "Int") (eq $From.TypeKind "Uint")))
+	(and (eq $Opt "Fmt") (or (eq $From.TypeKind "Float") (eq $From.TypeKind "Complex")))
+	(and (eq $Opt "Prec") (or (eq $From.TypeKind "Float") (eq $From.TypeKind "Complex")))
+	(and (eq $Opt "FmtPrec") (or (eq $From.TypeKind "Float") (eq $From.TypeKind "Complex")))
+}}
+func (e {{$From.TypeName}}) ToString{{$Opt}}(
+	{{- if eq $Opt "Base"}}base int
+	{{- else if eq $Opt "Fmt"}}fmt byte
+	{{- else if eq $Opt "Prec"}}prec int
+	{{- else if eq $Opt "FmtPrec"}}fmt byte, prec int{{end}}) String {
 	return String{strconv.Format{{$From.TypeKind}}(e
 		{{- if ne $From.BitSize 64}}.To{{$From.TypeKind}}
 			{{- if ne $From.TypeKind "Complex"}}64{{else}}128{{end}}()
 		{{- end}}.{{$From.TypeKind}}{{- if ne $From.TypeKind "Complex"}}64{{else}}128{{end}},
-		{{- if eq $From.TypeKind "Int"}} {{$.StrconvIntBaseName}}
-		{{- else if eq $From.TypeKind "Uint"}} {{$.StrconvUintBaseName}}
-		{{- else if or (eq $From.TypeKind "Float") (eq $From.TypeKind "Complex") -}}
-			{{$.StrconvFloatFmtName}}, {{$.StrconvFloatPrecName}},
+		{{- if eq $Opt "Base"}} base
+		{{- else if and (eq $Opt "") (eq $From.TypeKind "Int")}} {{$.StrconvIntBaseName}}
+		{{- else if and (eq $Opt "") (eq $From.TypeKind "Uint")}} {{$.StrconvUintBaseName}}
+		{{- end -}}
+		{{- if or (eq $From.TypeKind "Float") (eq $From.TypeKind "Complex")}}
+			{{- if or (eq $Opt "Fmt") (eq $Opt "FmtPrec")}} fmt{{else}} {{$.StrconvFloatFmtName}}{{end}},
+			{{- if or (eq $Opt "Prec") (eq $Opt "FmtPrec")}} prec{{else}} {{$.StrconvFloatPrecName}}{{end}},
 			{{- if eq $From.TypeKind "Complex"}}
 				{{- if ne $From.TypeKind "Complex"}} 64{{else}} 128{{end}}
 			{{- else}} {{$From.BitSize}}
 			{{- end}}
-		{{- end -}})}
+		{{- end}})}
 }
-func (e {{$From.TypeName}}) ToBytes() Bytes {
-	return Bytes{forceconv.StringToBytes(e.ToString().String)}
+
+func (e {{$From.TypeName}}) ToBytes{{$Opt}}(
+	{{- if eq $Opt "Base"}}base int
+	{{- else if eq $Opt "Fmt"}}fmt byte
+	{{- else if eq $Opt "Prec"}}prec int
+	{{- else if eq $Opt "FmtPrec"}}fmt byte, prec int{{end}}) Bytes {
+	return Bytes{forceconv.StringToBytes(e.ToString{{$Opt}}(
+		{{- if eq $Opt "Base"}}base
+		{{- else if eq $Opt "Fmt"}}fmt
+		{{- else if eq $Opt "Prec"}}prec
+		{{- else if eq $Opt "FmtPrec"}}fmt, prec{{end}}).String)}
 }
+
+{{end -}}
+{{- end}} {{- /* range $Opt */ -}}
+
 {{end}} {{- /* range $From */ -}}
