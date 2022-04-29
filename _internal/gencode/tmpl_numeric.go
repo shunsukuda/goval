@@ -58,10 +58,20 @@ func (e {{$From.TypeName}}) To{{$To.TypeName}}() {{$To.TypeName}} {
 	return {{if eq $From.TypeName $To.TypeName}}e
 	{{- else}}{{$To.TypeName}}{
 		{{- if eq $To.TypeKind "Complex"}}
-			{{- if eq $From.TypeKind "Complex"}}e.To{{$To.TypeName}}().{{$To.TypeName}}{{- else}}complex(e.ToFloat{{$To.BitSize}}().Float{{$To.BitSize}}, float{{$To.BitSize}}(0)){{end}}
+			{{- if eq $From.TypeKind "Complex"}} {{/* Complex To Complex */}}
+				e.To{{$To.TypeName}}().{{$To.TypeName}}
+			{{- else}}
+				complex(e.ToFloat{{$To.BitSize}}().Float{{$To.BitSize}}, float{{$To.BitSize}}(0))
+			{{- end}}
 		{{- else if eq $From.TypeKind "Complex"}}
-			{{- if eq $To.TypeKind "Complex"}}e{{else}}{{$To.GoTypeName}}(real(e.{{$From.TypeName}})){{end}}
-		{{- else}}{{$To.GoTypeName}}(e.{{$From.TypeName}}){{end}}}
+			{{- if eq $To.TypeKind "Complex"}}
+				e
+			{{- else}}
+				{{$To.GoTypeName}}(real(e.{{$From.TypeName}}))
+			{{- end}}
+		{{- else}}
+			{{$To.GoTypeName}}(e.{{$From.TypeName}})
+		{{- end}} }
 	{{- end}}
 }
 func (e {{$From.TypeName}}) To{{$To.TypeName}}Eq() ({{$To.TypeName}}, bool) {
