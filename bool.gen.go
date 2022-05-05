@@ -8,21 +8,9 @@ type Bool struct {
 	Bool bool
 }
 
-func (e Bool) GoBool() bool {
-	return e.Bool
-}
-func (e Bool) Interface() interface{} {
-	return e.Bool
-}
-func (e Bool) Val() Val {
-	return e
-}
-func (e Bool) Type() Type {
-	return ValTypes.Bool
-}
-func (e Bool) Equal(x Bool) bool {
-	return e.Bool == x.Bool
-}
+// func (e Bool) GoBool() bool { return e.Bool }
+func (e Bool) Type() Type        { return ValTypes.Bool }
+func (e Bool) Equal(x Bool) bool { return e.Bool == x.Bool }
 
 func (e Bool) ToInt8() Int8 {
 	if e.Bool {
@@ -97,12 +85,6 @@ func (e Bool) ToComplex128() Complex128 {
 	return Complex128{0}
 }
 
-func (e Bool) ToBool() Bool {
-	return e
-}
-func (e Bool) ToString() String {
-	return String{strconv.FormatBool(e.Bool)}
-}
-func (e Bool) ToBytes() Bytes {
-	return e.ToString().ToBytes()
-}
+func (e Bool) ToBool() Bool     { return e }
+func (e Bool) ToString() String { return String{strconv.FormatBool(e.Bool)} }
+func (e Bool) ToBytes() Bytes   { return e.ToString().ToBytes() }

@@ -13,12 +13,13 @@ type tmplTypeInfo struct {
 	RefKind    string
 	ZeroValue  string
 	BitSize    int
-	Sizeof     int
+	SizeOf     int
 }
 
 type tmplConfNumeric struct {
-	To                    []tmplTypeInfo
 	From                  []tmplTypeInfo
+	To                    []tmplTypeInfo
+	ToString              []tmplTypeInfo
 	ToStringFuncs         []string
 	StrconvIntBaseName    string
 	StrconvIntBaseValue   string
@@ -31,8 +32,8 @@ type tmplConfNumeric struct {
 }
 
 type tmplConfString struct {
-	To   []tmplTypeInfo
 	From []tmplTypeInfo
+	To   []tmplTypeInfo
 }
 
 type tmplConfTypeInfoList struct {
@@ -71,45 +72,46 @@ var (
 		{TypeName: "Uint64", GoTypeName: "uint64", TypeKind: "Uint", RefKind: "", BitSize: 64},
 		{TypeName: "Float32", GoTypeName: "float32", TypeKind: "Float", RefKind: "", BitSize: 32},
 		{TypeName: "Float64", GoTypeName: "float64", TypeKind: "Float", RefKind: "", BitSize: 64},
-		{TypeName: "Complex64", GoTypeName: "complex64", TypeKind: "Complex", RefKind: "", BitSize: 64},
-		{TypeName: "Complex128", GoTypeName: "complex128", TypeKind: "Complex", RefKind: "", BitSize: 128},
+		{TypeName: "Complex64", GoTypeName: "complex64", TypeKind: "Complex", RefKind: "", BitSize: 32},
+		{TypeName: "Complex128", GoTypeName: "complex128", TypeKind: "Complex", RefKind: "", BitSize: 64},
 		{TypeName: "String", GoTypeName: "string", TypeKind: "String", RefKind: "", BitSize: 0},
 		{TypeName: "Bytes", GoTypeName: "[]byte", TypeKind: "Bytes", RefKind: "Slice", BitSize: 0},
 	}
 
 	typeInfoListSlice = []tmplTypeInfo{
-		{TypeName: "Bool", GoTypeName: "bool", TypeKind: "Bool", RefKind: "Bool", BitSize: 1},
-		{TypeName: "Int8", GoTypeName: "int8", TypeKind: "Int", RefKind: "", BitSize: 8},
-		{TypeName: "Int16", GoTypeName: "int16", TypeKind: "Int", RefKind: "", BitSize: 16},
-		{TypeName: "Int32", GoTypeName: "int32", TypeKind: "Int", RefKind: "", BitSize: 32},
-		{TypeName: "Int64", GoTypeName: "int64", TypeKind: "Int", RefKind: "", BitSize: 64},
-		{TypeName: "Uint8", GoTypeName: "uint8", TypeKind: "Uint", RefKind: "", BitSize: 8},
-		{TypeName: "Uint16", GoTypeName: "uint16", TypeKind: "Uint", RefKind: "", BitSize: 16},
-		{TypeName: "Uint32", GoTypeName: "uint32", TypeKind: "Uint", RefKind: "", BitSize: 32},
-		{TypeName: "Uint64", GoTypeName: "uint64", TypeKind: "Uint", RefKind: "", BitSize: 64},
-		{TypeName: "Float32", GoTypeName: "float32", TypeKind: "Float", RefKind: "", BitSize: 32},
-		{TypeName: "Float64", GoTypeName: "float64", TypeKind: "Float", RefKind: "", BitSize: 64},
-		{TypeName: "Complex64", GoTypeName: "complex64", TypeKind: "Complex", RefKind: "", BitSize: 64},
-		{TypeName: "Complex128", GoTypeName: "complex128", TypeKind: "Complex", RefKind: "", BitSize: 128},
-		{TypeName: "String", GoTypeName: "string", TypeKind: "String", RefKind: "", BitSize: 0},
+		{TypeName: "Bool", GoTypeName: "bool", TypeKind: "Bool", RefKind: "Bool", BitSize: 1, SizeOf: 1},
+		{TypeName: "Int8", GoTypeName: "int8", TypeKind: "Int", RefKind: "", BitSize: 8, SizeOf: 1},
+		{TypeName: "Int16", GoTypeName: "int16", TypeKind: "Int", RefKind: "", BitSize: 16, SizeOf: 2},
+		{TypeName: "Int32", GoTypeName: "int32", TypeKind: "Int", RefKind: "", BitSize: 32, SizeOf: 4},
+		{TypeName: "Int64", GoTypeName: "int64", TypeKind: "Int", RefKind: "", BitSize: 64, SizeOf: 8},
+		{TypeName: "Uint8", GoTypeName: "uint8", TypeKind: "Uint", RefKind: "", BitSize: 8, SizeOf: 1},
+		{TypeName: "Uint16", GoTypeName: "uint16", TypeKind: "Uint", RefKind: "", BitSize: 16, SizeOf: 2},
+		{TypeName: "Uint32", GoTypeName: "uint32", TypeKind: "Uint", RefKind: "", BitSize: 32, SizeOf: 4},
+		{TypeName: "Uint64", GoTypeName: "uint64", TypeKind: "Uint", RefKind: "", BitSize: 64, SizeOf: 8},
+		{TypeName: "Float32", GoTypeName: "float32", TypeKind: "Float", RefKind: "", BitSize: 32, SizeOf: 4},
+		{TypeName: "Float64", GoTypeName: "float64", TypeKind: "Float", RefKind: "", BitSize: 64, SizeOf: 8},
+		{TypeName: "Complex64", GoTypeName: "complex64", TypeKind: "Complex", RefKind: "", BitSize: 32, SizeOf: 8},
+		{TypeName: "Complex128", GoTypeName: "complex128", TypeKind: "Complex", RefKind: "", BitSize: 64, SizeOf: 16},
+		//{TypeName: "String", GoTypeName: "string", TypeKind: "String", RefKind: "", BitSize: 0, SizeOf: 16},
 	}
 
 	tmplDataNumeric = tmplConfNumeric{
-		To:                    typeInfoListNumeric,
 		From:                  typeInfoListNumeric,
+		To:                    typeInfoListNumeric,
+		ToString:              typeInfoListString,
 		ToStringFuncs:         []string{"", "Base", "Fmt", "Prec", "FmtPrec"},
 		StrconvIntBaseName:    "IntToStringBase",
 		StrconvIntBaseValue:   "10",
 		StrconvUintBaseName:   "UintToStringBase",
-		StrconvUintBaseValue:  "16",
+		StrconvUintBaseValue:  "10",
 		StrconvFloatFmtName:   "FloatToStringFmt",
 		StrconvFloatFmtValue:  "'g'",
 		StrconvFloatPrecName:  "FloatToStringPrec",
 		StrconvFloatPrecValue: "-1",
 	}
 	tmplDataString = tmplConfString{
-		To:   typeInfoListNumeric,
 		From: typeInfoListString,
+		To:   typeInfoListNumeric,
 	}
 	tmplDataGeneral = tmplConfTypeInfoList{
 		TL: typeInfoListNumeric,
@@ -132,8 +134,11 @@ type tmplSet struct {
 func main() {
 	set := []tmplSet{
 		{Name: "Numeric", Input: "tmpl_numeric.go", Output: "numeric.gen.go", Config: tmplDataNumeric},
+		{Name: "NumericTest", Input: "tmpl_numeric_test.go", Output: "numeric.gen_test.go", Config: tmplDataNumeric},
 		{Name: "String", Input: "tmpl_string.go", Output: "string.gen.go", Config: tmplDataString},
+		{Name: "StringTest", Input: "tmpl_string_test.go", Output: "string.gen_test.go", Config: tmplDataString},
 		{Name: "Bool", Input: "tmpl_bool.go", Output: "bool.gen.go", Config: tmplDataGeneral},
+		{Name: "BoolTest", Input: "tmpl_bool_test.go", Output: "bool.gen_test.go", Config: tmplDataGeneral},
 		{Name: "Type", Input: "tmpl_type.go", Output: "type.gen.go", Config: tmplDataType},
 		{Name: "Slice", Input: "tmpl_slice.go", Output: "slice.gen.go", Config: tmplDataSlice},
 	}

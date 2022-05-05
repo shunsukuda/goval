@@ -1,10 +1,7 @@
 package goval
 
 import (
-	"fmt"
-
 	"github.com/apache/arrow/go/arrow"
-	"github.com/shunsukuda/forceconv"
 )
 
 type IntConverter interface {
@@ -232,11 +229,3 @@ func ToBytesEq(x BytesConverter) (Bytes, bool) {
 	return x.ToBytesEq()
 }
 */
-
-func ToStringFormat(x Val, format string) String {
-	return String{fmt.Sprintf(format, x.Interface())}
-}
-
-func ToBytesFormat(x Val, format string) Bytes {
-	return Bytes{forceconv.StringToBytes(fmt.Sprintf(format, x.Interface()))}
-}

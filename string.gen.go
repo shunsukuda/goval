@@ -1,6 +1,7 @@
 package goval
 
 import (
+	"bytes"
 	"strconv"
 
 	"github.com/shunsukuda/forceconv"
@@ -10,8 +11,11 @@ type String struct {
 	String string
 }
 
-func (e String) GoString() string { return e.String }
-func (e String) Type() Type       { return ValTypes.String }
+// func (e String) GoString() string { return e.String }
+func (e String) Type() Type          { return ValTypes.String }
+func (e String) Equal(x String) bool { return e.String == x.String }
+func (e String) IsZero() bool        { return e.Len() == 0 }
+func (e String) Len() int            { return len(e.String) }
 
 func (e String) ToInt8() Int8 {
 	ce, _ := strconv.ParseInt(e.String, 0, 8)
@@ -88,8 +92,11 @@ type Bytes struct {
 	Bytes []byte
 }
 
-func (e Bytes) GoBytes() []byte { return e.Bytes }
-func (e Bytes) Type() Type      { return ValTypes.Bytes }
+// func (e Bytes) GoBytes() []byte { return e.Bytes }
+func (e Bytes) Type() Type         { return ValTypes.Bytes }
+func (e Bytes) Equal(x Bytes) bool { return bytes.Equal(e.Bytes, x.Bytes) }
+func (e Bytes) IsZero() bool       { return e.Len() == 0 }
+func (e Bytes) Len() int           { return len(e.Bytes) }
 
 func (e Bytes) ToInt8() Int8 {
 	return e.ToString().ToInt8()

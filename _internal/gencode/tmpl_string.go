@@ -1,6 +1,7 @@
 package goval
 
 import (
+	"bytes"
 	"strconv"
 
 	"github.com/shunsukuda/forceconv"
@@ -12,8 +13,13 @@ type {{$From.TypeName}} struct {
 	{{$From.TypeName}} {{$From.GoTypeName}}
 }
 
-func (e {{$From.TypeName}}) Go{{$From.TypeName}}() {{$From.GoTypeName}} { return e.{{$From.TypeName}} }
+// func (e {{$From.TypeName}}) Go{{$From.TypeName}}() {{$From.GoTypeName}} { return e.{{$From.TypeName}} }
 func (e {{$From.TypeName}}) Type() Type { return ValTypes.{{$From.TypeName}} }
+func (e {{$From.TypeName}}) Equal(x {{$From.TypeName}}) bool { return
+	{{- if eq $From.TypeName "String"}} e.String == x.String{{else}} bytes.Equal(e.Bytes, x.Bytes){{end}} }
+func (e {{$From.TypeName}}) IsZero() bool { return e.Len() == 0 }
+func (e {{$From.TypeName}}) Len() int { return len(e.{{$From.TypeName}}) }
+
 {{range $To := $.To}}
 func (e {{$From.TypeName}}) To{{$To.TypeName}}() {{$To.TypeName}} {
 	{{if eq $From.TypeName "String" -}}

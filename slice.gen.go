@@ -1,151 +1,1668 @@
 package goval
 
+import (
+	"errors"
+	"reflect"
+	"unsafe"
+
+	"github.com/shunsukuda/forceconv"
+	"github.com/valyala/bytebufferpool"
+)
+
+const (
+	maxInt = int(^uint(0) >> 1)
+)
+
+var (
+	defaultByteBufferPool = bytebufferpool.Pool{}
+	minSliceSize          = 64
+)
+
+var (
+	ErrTooLarge = errors.New("shunsukuda.goval.Slice: too large")
+)
+
 type ValSlice interface {
-	Interface() interface{}
-	ValSlice() ValSlice
 	Type() Type
 	Len() int
 	Cap() int
 	Grow(n int)
+	Resize(n int)
+	PoolGet()
+	PoolPut()
 	Reset()
 }
 
-type BoolSlice []bool
+func makeByteSlice(n, bs int) []byte {
+	defer func() {
+		if recover() != nil {
+			panic(ErrTooLarge)
+		}
+	}()
+	return make([]byte, n*bs)
+}
 
-func NewBoolSlice(s []bool) BoolSlice { return s }
+type BoolSlice struct {
+	S    []Bool
+	ubbp bool // use ByteBuffer Pool
+}
 
-func (s *BoolSlice) Interface() interface{} { return s.BoolSlice() }
-func (s *BoolSlice) BoolSlice() []bool      { return *s }
-func (s *BoolSlice) Type() Type             { return ValTypes.Bool }
-func (s *BoolSlice) Len() int               { return len(*s) }
-func (s *BoolSlice) Cap() int               { return cap(*s) }
+func forceconvSliceFromGoBool(s []bool) []Bool {
+	return *(*[]Bool)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s)).Data,
+		Len:  len(s),
+		Cap:  cap(s),
+	}))
+}
+func NewBoolSlice(ubbp bool) BoolSlice {
+	return BoolSlice{nil, ubbp}
+}
+func NewBoolSliceFromGoSlice(s []bool, ubbp bool) BoolSlice {
+	return BoolSlice{forceconvSliceFromGoBool(s), ubbp}
+}
 
-type Int8Slice []int8
+func (s BoolSlice) GoSlice() []bool {
+	return *(*[]bool)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s.S)).Data,
+		Len:  s.Len(),
+		Cap:  s.Cap(),
+	}))
+}
 
-func NewInt8Slice(s []int8) Int8Slice { return s }
+func (s BoolSlice) UseByteBufferPool() bool { return s.ubbp }
 
-func (s *Int8Slice) Interface() interface{} { return s.Int8Slice() }
-func (s *Int8Slice) Int8Slice() []int8      { return *s }
-func (s *Int8Slice) Type() Type             { return ValTypes.Int8 }
-func (s *Int8Slice) Len() int               { return len(*s) }
-func (s *Int8Slice) Cap() int               { return cap(*s) }
+func (s BoolSlice) Copy() BoolSlice {
+	buf := NewBoolSlice(s.ubbp)
+	if s.ubbp {
+		buf.PoolGet()
+	}
+	buf.Resize(s.Len())
+	return buf
+}
 
-type Int16Slice []int16
+func (s BoolSlice) Type() Type { return ValTypes.Bool }
+func (s BoolSlice) Len() int   { return len(s.S) }
+func (s BoolSlice) Cap() int   { return cap(s.S) }
 
-func NewInt16Slice(s []int16) Int16Slice { return s }
+func (s *BoolSlice) Reset() {
+	s.S = s.S[:0]
+}
 
-func (s *Int16Slice) Interface() interface{} { return s.Int16Slice() }
-func (s *Int16Slice) Int16Slice() []int16    { return *s }
-func (s *Int16Slice) Type() Type             { return ValTypes.Int16 }
-func (s *Int16Slice) Len() int               { return len(*s) }
-func (s *Int16Slice) Cap() int               { return cap(*s) }
+func (s *BoolSlice) tryGrowByReslice(n int) (int, bool) {
+	if l := len(s.S); n <= cap(s.S)-l {
+		s.S = s.S[:l+n]
+		return l, true
+	}
+	return 0, false
+}
 
-type Int32Slice []int32
+func (s *BoolSlice) grow(n int) int {
+	m := s.Len()
+	if i, ok := s.tryGrowByReslice(n); ok {
+		return i
+	}
+	if s.S == nil && n <= minSliceSize {
+		if s.ubbp {
+			s.PoolGet()
+		} else {
+			s.S = make([]Bool, n, minSliceSize)
+		}
+		return 0
+	}
+	x := 1.25
+	c := s.Cap()
+	if c < 1024 {
+		x = 2
+	}
+	c = int(float64(c) * x)
+	if c >= (maxInt - n) {
+		panic(ErrTooLarge)
+	} else {
+		buf := forceconvSliceFromGoBool(forceconv.BytesToBoolSlice(makeByteSlice(c+n, 1)))
+		copy(buf, s.S)
+		if s.ubbp {
+			s.PoolPut()
+		}
+		s.S = buf
+	}
+	s.S = s.S[:m+n]
+	return m
+}
 
-func NewInt32Slice(s []int32) Int32Slice { return s }
+func (s *BoolSlice) Grow(n int) {
+	if n < 0 {
+		panic("shunsukuda.goval.BoolSlice.Grow: negative count")
+	}
+	m := s.grow(n)
+	s.S = s.S[:m]
+}
 
-func (s *Int32Slice) Interface() interface{} { return s.Int32Slice() }
-func (s *Int32Slice) Int32Slice() []int32    { return *s }
-func (s *Int32Slice) Type() Type             { return ValTypes.Int32 }
-func (s *Int32Slice) Len() int               { return len(*s) }
-func (s *Int32Slice) Cap() int               { return cap(*s) }
+func (s *BoolSlice) Resize(n int) {
+	m := n - s.Len()
+	if m > 0 {
+		s.Grow(m)
+	}
+	s.S = s.S[:n]
+}
 
-type Int64Slice []int64
+func (s *BoolSlice) PoolGet() {
+	if !s.ubbp {
+		return
+	}
+	if s.S == nil {
+		s.S = forceconvSliceFromGoBool(forceconv.BytesToBoolSlice(defaultByteBufferPool.Get().B[:0]))
+	}
+	if s.S == nil {
+		s.S = make([]Bool, minSliceSize)
+	}
+}
 
-func NewInt64Slice(s []int64) Int64Slice { return s }
+func (s *BoolSlice) PoolPut() {
+	if !s.ubbp {
+		return
+	}
+	if s.S != nil {
+		defaultByteBufferPool.Put(&bytebufferpool.ByteBuffer{forceconv.BoolSliceToBytes(s.GoSlice()[:0])})
+		s.S = nil
+	}
+}
 
-func (s *Int64Slice) Interface() interface{} { return s.Int64Slice() }
-func (s *Int64Slice) Int64Slice() []int64    { return *s }
-func (s *Int64Slice) Type() Type             { return ValTypes.Int64 }
-func (s *Int64Slice) Len() int               { return len(*s) }
-func (s *Int64Slice) Cap() int               { return cap(*s) }
+type Int8Slice struct {
+	S    []Int8
+	ubbp bool // use ByteBuffer Pool
+}
 
-type Uint8Slice []uint8
+func forceconvSliceFromGoInt8(s []int8) []Int8 {
+	return *(*[]Int8)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s)).Data,
+		Len:  len(s),
+		Cap:  cap(s),
+	}))
+}
+func NewInt8Slice(ubbp bool) Int8Slice {
+	return Int8Slice{nil, ubbp}
+}
+func NewInt8SliceFromGoSlice(s []int8, ubbp bool) Int8Slice {
+	return Int8Slice{forceconvSliceFromGoInt8(s), ubbp}
+}
 
-func NewUint8Slice(s []uint8) Uint8Slice { return s }
+func (s Int8Slice) GoSlice() []int8 {
+	return *(*[]int8)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s.S)).Data,
+		Len:  s.Len(),
+		Cap:  s.Cap(),
+	}))
+}
 
-func (s *Uint8Slice) Interface() interface{} { return s.Uint8Slice() }
-func (s *Uint8Slice) Uint8Slice() []uint8    { return *s }
-func (s *Uint8Slice) Type() Type             { return ValTypes.Uint8 }
-func (s *Uint8Slice) Len() int               { return len(*s) }
-func (s *Uint8Slice) Cap() int               { return cap(*s) }
+func (s Int8Slice) UseByteBufferPool() bool { return s.ubbp }
 
-type Uint16Slice []uint16
+func (s Int8Slice) Copy() Int8Slice {
+	buf := NewInt8Slice(s.ubbp)
+	if s.ubbp {
+		buf.PoolGet()
+	}
+	buf.Resize(s.Len())
+	return buf
+}
 
-func NewUint16Slice(s []uint16) Uint16Slice { return s }
+func (s Int8Slice) Type() Type { return ValTypes.Int8 }
+func (s Int8Slice) Len() int   { return len(s.S) }
+func (s Int8Slice) Cap() int   { return cap(s.S) }
 
-func (s *Uint16Slice) Interface() interface{} { return s.Uint16Slice() }
-func (s *Uint16Slice) Uint16Slice() []uint16  { return *s }
-func (s *Uint16Slice) Type() Type             { return ValTypes.Uint16 }
-func (s *Uint16Slice) Len() int               { return len(*s) }
-func (s *Uint16Slice) Cap() int               { return cap(*s) }
+func (s *Int8Slice) Reset() {
+	s.S = s.S[:0]
+}
 
-type Uint32Slice []uint32
+func (s *Int8Slice) tryGrowByReslice(n int) (int, bool) {
+	if l := len(s.S); n <= cap(s.S)-l {
+		s.S = s.S[:l+n]
+		return l, true
+	}
+	return 0, false
+}
 
-func NewUint32Slice(s []uint32) Uint32Slice { return s }
+func (s *Int8Slice) grow(n int) int {
+	m := s.Len()
+	if i, ok := s.tryGrowByReslice(n); ok {
+		return i
+	}
+	if s.S == nil && n <= minSliceSize {
+		if s.ubbp {
+			s.PoolGet()
+		} else {
+			s.S = make([]Int8, n, minSliceSize)
+		}
+		return 0
+	}
+	x := 1.25
+	c := s.Cap()
+	if c < 1024 {
+		x = 2
+	}
+	c = int(float64(c) * x)
+	if c >= (maxInt - n) {
+		panic(ErrTooLarge)
+	} else {
+		buf := forceconvSliceFromGoInt8(forceconv.BytesToInt8Slice(makeByteSlice(c+n, 1)))
+		copy(buf, s.S)
+		if s.ubbp {
+			s.PoolPut()
+		}
+		s.S = buf
+	}
+	s.S = s.S[:m+n]
+	return m
+}
 
-func (s *Uint32Slice) Interface() interface{} { return s.Uint32Slice() }
-func (s *Uint32Slice) Uint32Slice() []uint32  { return *s }
-func (s *Uint32Slice) Type() Type             { return ValTypes.Uint32 }
-func (s *Uint32Slice) Len() int               { return len(*s) }
-func (s *Uint32Slice) Cap() int               { return cap(*s) }
+func (s *Int8Slice) Grow(n int) {
+	if n < 0 {
+		panic("shunsukuda.goval.Int8Slice.Grow: negative count")
+	}
+	m := s.grow(n)
+	s.S = s.S[:m]
+}
 
-type Uint64Slice []uint64
+func (s *Int8Slice) Resize(n int) {
+	m := n - s.Len()
+	if m > 0 {
+		s.Grow(m)
+	}
+	s.S = s.S[:n]
+}
 
-func NewUint64Slice(s []uint64) Uint64Slice { return s }
+func (s *Int8Slice) PoolGet() {
+	if !s.ubbp {
+		return
+	}
+	if s.S == nil {
+		s.S = forceconvSliceFromGoInt8(forceconv.BytesToInt8Slice(defaultByteBufferPool.Get().B[:0]))
+	}
+	if s.S == nil {
+		s.S = make([]Int8, minSliceSize)
+	}
+}
 
-func (s *Uint64Slice) Interface() interface{} { return s.Uint64Slice() }
-func (s *Uint64Slice) Uint64Slice() []uint64  { return *s }
-func (s *Uint64Slice) Type() Type             { return ValTypes.Uint64 }
-func (s *Uint64Slice) Len() int               { return len(*s) }
-func (s *Uint64Slice) Cap() int               { return cap(*s) }
+func (s *Int8Slice) PoolPut() {
+	if !s.ubbp {
+		return
+	}
+	if s.S != nil {
+		defaultByteBufferPool.Put(&bytebufferpool.ByteBuffer{forceconv.Int8SliceToBytes(s.GoSlice()[:0])})
+		s.S = nil
+	}
+}
 
-type Float32Slice []float32
+type Int16Slice struct {
+	S    []Int16
+	ubbp bool // use ByteBuffer Pool
+}
 
-func NewFloat32Slice(s []float32) Float32Slice { return s }
+func forceconvSliceFromGoInt16(s []int16) []Int16 {
+	return *(*[]Int16)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s)).Data,
+		Len:  len(s),
+		Cap:  cap(s),
+	}))
+}
+func NewInt16Slice(ubbp bool) Int16Slice {
+	return Int16Slice{nil, ubbp}
+}
+func NewInt16SliceFromGoSlice(s []int16, ubbp bool) Int16Slice {
+	return Int16Slice{forceconvSliceFromGoInt16(s), ubbp}
+}
 
-func (s *Float32Slice) Interface() interface{}  { return s.Float32Slice() }
-func (s *Float32Slice) Float32Slice() []float32 { return *s }
-func (s *Float32Slice) Type() Type              { return ValTypes.Float32 }
-func (s *Float32Slice) Len() int                { return len(*s) }
-func (s *Float32Slice) Cap() int                { return cap(*s) }
+func (s Int16Slice) GoSlice() []int16 {
+	return *(*[]int16)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s.S)).Data,
+		Len:  s.Len(),
+		Cap:  s.Cap(),
+	}))
+}
 
-type Float64Slice []float64
+func (s Int16Slice) UseByteBufferPool() bool { return s.ubbp }
 
-func NewFloat64Slice(s []float64) Float64Slice { return s }
+func (s Int16Slice) Copy() Int16Slice {
+	buf := NewInt16Slice(s.ubbp)
+	if s.ubbp {
+		buf.PoolGet()
+	}
+	buf.Resize(s.Len())
+	return buf
+}
 
-func (s *Float64Slice) Interface() interface{}  { return s.Float64Slice() }
-func (s *Float64Slice) Float64Slice() []float64 { return *s }
-func (s *Float64Slice) Type() Type              { return ValTypes.Float64 }
-func (s *Float64Slice) Len() int                { return len(*s) }
-func (s *Float64Slice) Cap() int                { return cap(*s) }
+func (s Int16Slice) Type() Type { return ValTypes.Int16 }
+func (s Int16Slice) Len() int   { return len(s.S) }
+func (s Int16Slice) Cap() int   { return cap(s.S) }
 
-type Complex64Slice []complex64
+func (s *Int16Slice) Reset() {
+	s.S = s.S[:0]
+}
 
-func NewComplex64Slice(s []complex64) Complex64Slice { return s }
+func (s *Int16Slice) tryGrowByReslice(n int) (int, bool) {
+	if l := len(s.S); n <= cap(s.S)-l {
+		s.S = s.S[:l+n]
+		return l, true
+	}
+	return 0, false
+}
 
-func (s *Complex64Slice) Interface() interface{}      { return s.Complex64Slice() }
-func (s *Complex64Slice) Complex64Slice() []complex64 { return *s }
-func (s *Complex64Slice) Type() Type                  { return ValTypes.Complex64 }
-func (s *Complex64Slice) Len() int                    { return len(*s) }
-func (s *Complex64Slice) Cap() int                    { return cap(*s) }
+func (s *Int16Slice) grow(n int) int {
+	m := s.Len()
+	if i, ok := s.tryGrowByReslice(n); ok {
+		return i
+	}
+	if s.S == nil && n <= minSliceSize {
+		if s.ubbp {
+			s.PoolGet()
+		} else {
+			s.S = make([]Int16, n, minSliceSize)
+		}
+		return 0
+	}
+	x := 1.25
+	c := s.Cap()
+	if c < 1024 {
+		x = 2
+	}
+	c = int(float64(c) * x)
+	if c >= (maxInt-n)/2 {
+		panic(ErrTooLarge)
+	} else {
+		buf := forceconvSliceFromGoInt16(forceconv.BytesToInt16Slice(makeByteSlice(c+n, 2)))
+		copy(buf, s.S)
+		if s.ubbp {
+			s.PoolPut()
+		}
+		s.S = buf
+	}
+	s.S = s.S[:m+n]
+	return m
+}
 
-type Complex128Slice []complex128
+func (s *Int16Slice) Grow(n int) {
+	if n < 0 {
+		panic("shunsukuda.goval.Int16Slice.Grow: negative count")
+	}
+	m := s.grow(n)
+	s.S = s.S[:m]
+}
 
-func NewComplex128Slice(s []complex128) Complex128Slice { return s }
+func (s *Int16Slice) Resize(n int) {
+	m := n - s.Len()
+	if m > 0 {
+		s.Grow(m)
+	}
+	s.S = s.S[:n]
+}
 
-func (s *Complex128Slice) Interface() interface{}        { return s.Complex128Slice() }
-func (s *Complex128Slice) Complex128Slice() []complex128 { return *s }
-func (s *Complex128Slice) Type() Type                    { return ValTypes.Complex128 }
-func (s *Complex128Slice) Len() int                      { return len(*s) }
-func (s *Complex128Slice) Cap() int                      { return cap(*s) }
+func (s *Int16Slice) PoolGet() {
+	if !s.ubbp {
+		return
+	}
+	if s.S == nil {
+		s.S = forceconvSliceFromGoInt16(forceconv.BytesToInt16Slice(defaultByteBufferPool.Get().B[:0]))
+	}
+	if s.S == nil {
+		s.S = make([]Int16, minSliceSize)
+	}
+}
 
-type StringSlice []string
+func (s *Int16Slice) PoolPut() {
+	if !s.ubbp {
+		return
+	}
+	if s.S != nil {
+		defaultByteBufferPool.Put(&bytebufferpool.ByteBuffer{forceconv.Int16SliceToBytes(s.GoSlice()[:0])})
+		s.S = nil
+	}
+}
 
-func NewStringSlice(s []string) StringSlice { return s }
+type Int32Slice struct {
+	S    []Int32
+	ubbp bool // use ByteBuffer Pool
+}
 
-func (s *StringSlice) Interface() interface{} { return s.StringSlice() }
-func (s *StringSlice) StringSlice() []string  { return *s }
-func (s *StringSlice) Type() Type             { return ValTypes.String }
-func (s *StringSlice) Len() int               { return len(*s) }
-func (s *StringSlice) Cap() int               { return cap(*s) }
+func forceconvSliceFromGoInt32(s []int32) []Int32 {
+	return *(*[]Int32)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s)).Data,
+		Len:  len(s),
+		Cap:  cap(s),
+	}))
+}
+func NewInt32Slice(ubbp bool) Int32Slice {
+	return Int32Slice{nil, ubbp}
+}
+func NewInt32SliceFromGoSlice(s []int32, ubbp bool) Int32Slice {
+	return Int32Slice{forceconvSliceFromGoInt32(s), ubbp}
+}
+
+func (s Int32Slice) GoSlice() []int32 {
+	return *(*[]int32)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s.S)).Data,
+		Len:  s.Len(),
+		Cap:  s.Cap(),
+	}))
+}
+
+func (s Int32Slice) UseByteBufferPool() bool { return s.ubbp }
+
+func (s Int32Slice) Copy() Int32Slice {
+	buf := NewInt32Slice(s.ubbp)
+	if s.ubbp {
+		buf.PoolGet()
+	}
+	buf.Resize(s.Len())
+	return buf
+}
+
+func (s Int32Slice) Type() Type { return ValTypes.Int32 }
+func (s Int32Slice) Len() int   { return len(s.S) }
+func (s Int32Slice) Cap() int   { return cap(s.S) }
+
+func (s *Int32Slice) Reset() {
+	s.S = s.S[:0]
+}
+
+func (s *Int32Slice) tryGrowByReslice(n int) (int, bool) {
+	if l := len(s.S); n <= cap(s.S)-l {
+		s.S = s.S[:l+n]
+		return l, true
+	}
+	return 0, false
+}
+
+func (s *Int32Slice) grow(n int) int {
+	m := s.Len()
+	if i, ok := s.tryGrowByReslice(n); ok {
+		return i
+	}
+	if s.S == nil && n <= minSliceSize {
+		if s.ubbp {
+			s.PoolGet()
+		} else {
+			s.S = make([]Int32, n, minSliceSize)
+		}
+		return 0
+	}
+	x := 1.25
+	c := s.Cap()
+	if c < 1024 {
+		x = 2
+	}
+	c = int(float64(c) * x)
+	if c >= (maxInt-n)/4 {
+		panic(ErrTooLarge)
+	} else {
+		buf := forceconvSliceFromGoInt32(forceconv.BytesToInt32Slice(makeByteSlice(c+n, 4)))
+		copy(buf, s.S)
+		if s.ubbp {
+			s.PoolPut()
+		}
+		s.S = buf
+	}
+	s.S = s.S[:m+n]
+	return m
+}
+
+func (s *Int32Slice) Grow(n int) {
+	if n < 0 {
+		panic("shunsukuda.goval.Int32Slice.Grow: negative count")
+	}
+	m := s.grow(n)
+	s.S = s.S[:m]
+}
+
+func (s *Int32Slice) Resize(n int) {
+	m := n - s.Len()
+	if m > 0 {
+		s.Grow(m)
+	}
+	s.S = s.S[:n]
+}
+
+func (s *Int32Slice) PoolGet() {
+	if !s.ubbp {
+		return
+	}
+	if s.S == nil {
+		s.S = forceconvSliceFromGoInt32(forceconv.BytesToInt32Slice(defaultByteBufferPool.Get().B[:0]))
+	}
+	if s.S == nil {
+		s.S = make([]Int32, minSliceSize)
+	}
+}
+
+func (s *Int32Slice) PoolPut() {
+	if !s.ubbp {
+		return
+	}
+	if s.S != nil {
+		defaultByteBufferPool.Put(&bytebufferpool.ByteBuffer{forceconv.Int32SliceToBytes(s.GoSlice()[:0])})
+		s.S = nil
+	}
+}
+
+type Int64Slice struct {
+	S    []Int64
+	ubbp bool // use ByteBuffer Pool
+}
+
+func forceconvSliceFromGoInt64(s []int64) []Int64 {
+	return *(*[]Int64)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s)).Data,
+		Len:  len(s),
+		Cap:  cap(s),
+	}))
+}
+func NewInt64Slice(ubbp bool) Int64Slice {
+	return Int64Slice{nil, ubbp}
+}
+func NewInt64SliceFromGoSlice(s []int64, ubbp bool) Int64Slice {
+	return Int64Slice{forceconvSliceFromGoInt64(s), ubbp}
+}
+
+func (s Int64Slice) GoSlice() []int64 {
+	return *(*[]int64)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s.S)).Data,
+		Len:  s.Len(),
+		Cap:  s.Cap(),
+	}))
+}
+
+func (s Int64Slice) UseByteBufferPool() bool { return s.ubbp }
+
+func (s Int64Slice) Copy() Int64Slice {
+	buf := NewInt64Slice(s.ubbp)
+	if s.ubbp {
+		buf.PoolGet()
+	}
+	buf.Resize(s.Len())
+	return buf
+}
+
+func (s Int64Slice) Type() Type { return ValTypes.Int64 }
+func (s Int64Slice) Len() int   { return len(s.S) }
+func (s Int64Slice) Cap() int   { return cap(s.S) }
+
+func (s *Int64Slice) Reset() {
+	s.S = s.S[:0]
+}
+
+func (s *Int64Slice) tryGrowByReslice(n int) (int, bool) {
+	if l := len(s.S); n <= cap(s.S)-l {
+		s.S = s.S[:l+n]
+		return l, true
+	}
+	return 0, false
+}
+
+func (s *Int64Slice) grow(n int) int {
+	m := s.Len()
+	if i, ok := s.tryGrowByReslice(n); ok {
+		return i
+	}
+	if s.S == nil && n <= minSliceSize {
+		if s.ubbp {
+			s.PoolGet()
+		} else {
+			s.S = make([]Int64, n, minSliceSize)
+		}
+		return 0
+	}
+	x := 1.25
+	c := s.Cap()
+	if c < 1024 {
+		x = 2
+	}
+	c = int(float64(c) * x)
+	if c >= (maxInt-n)/8 {
+		panic(ErrTooLarge)
+	} else {
+		buf := forceconvSliceFromGoInt64(forceconv.BytesToInt64Slice(makeByteSlice(c+n, 8)))
+		copy(buf, s.S)
+		if s.ubbp {
+			s.PoolPut()
+		}
+		s.S = buf
+	}
+	s.S = s.S[:m+n]
+	return m
+}
+
+func (s *Int64Slice) Grow(n int) {
+	if n < 0 {
+		panic("shunsukuda.goval.Int64Slice.Grow: negative count")
+	}
+	m := s.grow(n)
+	s.S = s.S[:m]
+}
+
+func (s *Int64Slice) Resize(n int) {
+	m := n - s.Len()
+	if m > 0 {
+		s.Grow(m)
+	}
+	s.S = s.S[:n]
+}
+
+func (s *Int64Slice) PoolGet() {
+	if !s.ubbp {
+		return
+	}
+	if s.S == nil {
+		s.S = forceconvSliceFromGoInt64(forceconv.BytesToInt64Slice(defaultByteBufferPool.Get().B[:0]))
+	}
+	if s.S == nil {
+		s.S = make([]Int64, minSliceSize)
+	}
+}
+
+func (s *Int64Slice) PoolPut() {
+	if !s.ubbp {
+		return
+	}
+	if s.S != nil {
+		defaultByteBufferPool.Put(&bytebufferpool.ByteBuffer{forceconv.Int64SliceToBytes(s.GoSlice()[:0])})
+		s.S = nil
+	}
+}
+
+type Uint8Slice struct {
+	S    []Uint8
+	ubbp bool // use ByteBuffer Pool
+}
+
+func forceconvSliceFromGoUint8(s []uint8) []Uint8 {
+	return *(*[]Uint8)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s)).Data,
+		Len:  len(s),
+		Cap:  cap(s),
+	}))
+}
+func NewUint8Slice(ubbp bool) Uint8Slice {
+	return Uint8Slice{nil, ubbp}
+}
+func NewUint8SliceFromGoSlice(s []uint8, ubbp bool) Uint8Slice {
+	return Uint8Slice{forceconvSliceFromGoUint8(s), ubbp}
+}
+
+func (s Uint8Slice) GoSlice() []uint8 {
+	return *(*[]uint8)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s.S)).Data,
+		Len:  s.Len(),
+		Cap:  s.Cap(),
+	}))
+}
+
+func (s Uint8Slice) UseByteBufferPool() bool { return s.ubbp }
+
+func (s Uint8Slice) Copy() Uint8Slice {
+	buf := NewUint8Slice(s.ubbp)
+	if s.ubbp {
+		buf.PoolGet()
+	}
+	buf.Resize(s.Len())
+	return buf
+}
+
+func (s Uint8Slice) Type() Type { return ValTypes.Uint8 }
+func (s Uint8Slice) Len() int   { return len(s.S) }
+func (s Uint8Slice) Cap() int   { return cap(s.S) }
+
+func (s *Uint8Slice) Reset() {
+	s.S = s.S[:0]
+}
+
+func (s *Uint8Slice) tryGrowByReslice(n int) (int, bool) {
+	if l := len(s.S); n <= cap(s.S)-l {
+		s.S = s.S[:l+n]
+		return l, true
+	}
+	return 0, false
+}
+
+func (s *Uint8Slice) grow(n int) int {
+	m := s.Len()
+	if i, ok := s.tryGrowByReslice(n); ok {
+		return i
+	}
+	if s.S == nil && n <= minSliceSize {
+		if s.ubbp {
+			s.PoolGet()
+		} else {
+			s.S = make([]Uint8, n, minSliceSize)
+		}
+		return 0
+	}
+	x := 1.25
+	c := s.Cap()
+	if c < 1024 {
+		x = 2
+	}
+	c = int(float64(c) * x)
+	if c >= (maxInt - n) {
+		panic(ErrTooLarge)
+	} else {
+		buf := forceconvSliceFromGoUint8(forceconv.BytesToUint8Slice(makeByteSlice(c+n, 1)))
+		copy(buf, s.S)
+		if s.ubbp {
+			s.PoolPut()
+		}
+		s.S = buf
+	}
+	s.S = s.S[:m+n]
+	return m
+}
+
+func (s *Uint8Slice) Grow(n int) {
+	if n < 0 {
+		panic("shunsukuda.goval.Uint8Slice.Grow: negative count")
+	}
+	m := s.grow(n)
+	s.S = s.S[:m]
+}
+
+func (s *Uint8Slice) Resize(n int) {
+	m := n - s.Len()
+	if m > 0 {
+		s.Grow(m)
+	}
+	s.S = s.S[:n]
+}
+
+func (s *Uint8Slice) PoolGet() {
+	if !s.ubbp {
+		return
+	}
+	if s.S == nil {
+		s.S = forceconvSliceFromGoUint8(forceconv.BytesToUint8Slice(defaultByteBufferPool.Get().B[:0]))
+	}
+	if s.S == nil {
+		s.S = make([]Uint8, minSliceSize)
+	}
+}
+
+func (s *Uint8Slice) PoolPut() {
+	if !s.ubbp {
+		return
+	}
+	if s.S != nil {
+		defaultByteBufferPool.Put(&bytebufferpool.ByteBuffer{forceconv.Uint8SliceToBytes(s.GoSlice()[:0])})
+		s.S = nil
+	}
+}
+
+type Uint16Slice struct {
+	S    []Uint16
+	ubbp bool // use ByteBuffer Pool
+}
+
+func forceconvSliceFromGoUint16(s []uint16) []Uint16 {
+	return *(*[]Uint16)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s)).Data,
+		Len:  len(s),
+		Cap:  cap(s),
+	}))
+}
+func NewUint16Slice(ubbp bool) Uint16Slice {
+	return Uint16Slice{nil, ubbp}
+}
+func NewUint16SliceFromGoSlice(s []uint16, ubbp bool) Uint16Slice {
+	return Uint16Slice{forceconvSliceFromGoUint16(s), ubbp}
+}
+
+func (s Uint16Slice) GoSlice() []uint16 {
+	return *(*[]uint16)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s.S)).Data,
+		Len:  s.Len(),
+		Cap:  s.Cap(),
+	}))
+}
+
+func (s Uint16Slice) UseByteBufferPool() bool { return s.ubbp }
+
+func (s Uint16Slice) Copy() Uint16Slice {
+	buf := NewUint16Slice(s.ubbp)
+	if s.ubbp {
+		buf.PoolGet()
+	}
+	buf.Resize(s.Len())
+	return buf
+}
+
+func (s Uint16Slice) Type() Type { return ValTypes.Uint16 }
+func (s Uint16Slice) Len() int   { return len(s.S) }
+func (s Uint16Slice) Cap() int   { return cap(s.S) }
+
+func (s *Uint16Slice) Reset() {
+	s.S = s.S[:0]
+}
+
+func (s *Uint16Slice) tryGrowByReslice(n int) (int, bool) {
+	if l := len(s.S); n <= cap(s.S)-l {
+		s.S = s.S[:l+n]
+		return l, true
+	}
+	return 0, false
+}
+
+func (s *Uint16Slice) grow(n int) int {
+	m := s.Len()
+	if i, ok := s.tryGrowByReslice(n); ok {
+		return i
+	}
+	if s.S == nil && n <= minSliceSize {
+		if s.ubbp {
+			s.PoolGet()
+		} else {
+			s.S = make([]Uint16, n, minSliceSize)
+		}
+		return 0
+	}
+	x := 1.25
+	c := s.Cap()
+	if c < 1024 {
+		x = 2
+	}
+	c = int(float64(c) * x)
+	if c >= (maxInt-n)/2 {
+		panic(ErrTooLarge)
+	} else {
+		buf := forceconvSliceFromGoUint16(forceconv.BytesToUint16Slice(makeByteSlice(c+n, 2)))
+		copy(buf, s.S)
+		if s.ubbp {
+			s.PoolPut()
+		}
+		s.S = buf
+	}
+	s.S = s.S[:m+n]
+	return m
+}
+
+func (s *Uint16Slice) Grow(n int) {
+	if n < 0 {
+		panic("shunsukuda.goval.Uint16Slice.Grow: negative count")
+	}
+	m := s.grow(n)
+	s.S = s.S[:m]
+}
+
+func (s *Uint16Slice) Resize(n int) {
+	m := n - s.Len()
+	if m > 0 {
+		s.Grow(m)
+	}
+	s.S = s.S[:n]
+}
+
+func (s *Uint16Slice) PoolGet() {
+	if !s.ubbp {
+		return
+	}
+	if s.S == nil {
+		s.S = forceconvSliceFromGoUint16(forceconv.BytesToUint16Slice(defaultByteBufferPool.Get().B[:0]))
+	}
+	if s.S == nil {
+		s.S = make([]Uint16, minSliceSize)
+	}
+}
+
+func (s *Uint16Slice) PoolPut() {
+	if !s.ubbp {
+		return
+	}
+	if s.S != nil {
+		defaultByteBufferPool.Put(&bytebufferpool.ByteBuffer{forceconv.Uint16SliceToBytes(s.GoSlice()[:0])})
+		s.S = nil
+	}
+}
+
+type Uint32Slice struct {
+	S    []Uint32
+	ubbp bool // use ByteBuffer Pool
+}
+
+func forceconvSliceFromGoUint32(s []uint32) []Uint32 {
+	return *(*[]Uint32)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s)).Data,
+		Len:  len(s),
+		Cap:  cap(s),
+	}))
+}
+func NewUint32Slice(ubbp bool) Uint32Slice {
+	return Uint32Slice{nil, ubbp}
+}
+func NewUint32SliceFromGoSlice(s []uint32, ubbp bool) Uint32Slice {
+	return Uint32Slice{forceconvSliceFromGoUint32(s), ubbp}
+}
+
+func (s Uint32Slice) GoSlice() []uint32 {
+	return *(*[]uint32)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s.S)).Data,
+		Len:  s.Len(),
+		Cap:  s.Cap(),
+	}))
+}
+
+func (s Uint32Slice) UseByteBufferPool() bool { return s.ubbp }
+
+func (s Uint32Slice) Copy() Uint32Slice {
+	buf := NewUint32Slice(s.ubbp)
+	if s.ubbp {
+		buf.PoolGet()
+	}
+	buf.Resize(s.Len())
+	return buf
+}
+
+func (s Uint32Slice) Type() Type { return ValTypes.Uint32 }
+func (s Uint32Slice) Len() int   { return len(s.S) }
+func (s Uint32Slice) Cap() int   { return cap(s.S) }
+
+func (s *Uint32Slice) Reset() {
+	s.S = s.S[:0]
+}
+
+func (s *Uint32Slice) tryGrowByReslice(n int) (int, bool) {
+	if l := len(s.S); n <= cap(s.S)-l {
+		s.S = s.S[:l+n]
+		return l, true
+	}
+	return 0, false
+}
+
+func (s *Uint32Slice) grow(n int) int {
+	m := s.Len()
+	if i, ok := s.tryGrowByReslice(n); ok {
+		return i
+	}
+	if s.S == nil && n <= minSliceSize {
+		if s.ubbp {
+			s.PoolGet()
+		} else {
+			s.S = make([]Uint32, n, minSliceSize)
+		}
+		return 0
+	}
+	x := 1.25
+	c := s.Cap()
+	if c < 1024 {
+		x = 2
+	}
+	c = int(float64(c) * x)
+	if c >= (maxInt-n)/4 {
+		panic(ErrTooLarge)
+	} else {
+		buf := forceconvSliceFromGoUint32(forceconv.BytesToUint32Slice(makeByteSlice(c+n, 4)))
+		copy(buf, s.S)
+		if s.ubbp {
+			s.PoolPut()
+		}
+		s.S = buf
+	}
+	s.S = s.S[:m+n]
+	return m
+}
+
+func (s *Uint32Slice) Grow(n int) {
+	if n < 0 {
+		panic("shunsukuda.goval.Uint32Slice.Grow: negative count")
+	}
+	m := s.grow(n)
+	s.S = s.S[:m]
+}
+
+func (s *Uint32Slice) Resize(n int) {
+	m := n - s.Len()
+	if m > 0 {
+		s.Grow(m)
+	}
+	s.S = s.S[:n]
+}
+
+func (s *Uint32Slice) PoolGet() {
+	if !s.ubbp {
+		return
+	}
+	if s.S == nil {
+		s.S = forceconvSliceFromGoUint32(forceconv.BytesToUint32Slice(defaultByteBufferPool.Get().B[:0]))
+	}
+	if s.S == nil {
+		s.S = make([]Uint32, minSliceSize)
+	}
+}
+
+func (s *Uint32Slice) PoolPut() {
+	if !s.ubbp {
+		return
+	}
+	if s.S != nil {
+		defaultByteBufferPool.Put(&bytebufferpool.ByteBuffer{forceconv.Uint32SliceToBytes(s.GoSlice()[:0])})
+		s.S = nil
+	}
+}
+
+type Uint64Slice struct {
+	S    []Uint64
+	ubbp bool // use ByteBuffer Pool
+}
+
+func forceconvSliceFromGoUint64(s []uint64) []Uint64 {
+	return *(*[]Uint64)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s)).Data,
+		Len:  len(s),
+		Cap:  cap(s),
+	}))
+}
+func NewUint64Slice(ubbp bool) Uint64Slice {
+	return Uint64Slice{nil, ubbp}
+}
+func NewUint64SliceFromGoSlice(s []uint64, ubbp bool) Uint64Slice {
+	return Uint64Slice{forceconvSliceFromGoUint64(s), ubbp}
+}
+
+func (s Uint64Slice) GoSlice() []uint64 {
+	return *(*[]uint64)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s.S)).Data,
+		Len:  s.Len(),
+		Cap:  s.Cap(),
+	}))
+}
+
+func (s Uint64Slice) UseByteBufferPool() bool { return s.ubbp }
+
+func (s Uint64Slice) Copy() Uint64Slice {
+	buf := NewUint64Slice(s.ubbp)
+	if s.ubbp {
+		buf.PoolGet()
+	}
+	buf.Resize(s.Len())
+	return buf
+}
+
+func (s Uint64Slice) Type() Type { return ValTypes.Uint64 }
+func (s Uint64Slice) Len() int   { return len(s.S) }
+func (s Uint64Slice) Cap() int   { return cap(s.S) }
+
+func (s *Uint64Slice) Reset() {
+	s.S = s.S[:0]
+}
+
+func (s *Uint64Slice) tryGrowByReslice(n int) (int, bool) {
+	if l := len(s.S); n <= cap(s.S)-l {
+		s.S = s.S[:l+n]
+		return l, true
+	}
+	return 0, false
+}
+
+func (s *Uint64Slice) grow(n int) int {
+	m := s.Len()
+	if i, ok := s.tryGrowByReslice(n); ok {
+		return i
+	}
+	if s.S == nil && n <= minSliceSize {
+		if s.ubbp {
+			s.PoolGet()
+		} else {
+			s.S = make([]Uint64, n, minSliceSize)
+		}
+		return 0
+	}
+	x := 1.25
+	c := s.Cap()
+	if c < 1024 {
+		x = 2
+	}
+	c = int(float64(c) * x)
+	if c >= (maxInt-n)/8 {
+		panic(ErrTooLarge)
+	} else {
+		buf := forceconvSliceFromGoUint64(forceconv.BytesToUint64Slice(makeByteSlice(c+n, 8)))
+		copy(buf, s.S)
+		if s.ubbp {
+			s.PoolPut()
+		}
+		s.S = buf
+	}
+	s.S = s.S[:m+n]
+	return m
+}
+
+func (s *Uint64Slice) Grow(n int) {
+	if n < 0 {
+		panic("shunsukuda.goval.Uint64Slice.Grow: negative count")
+	}
+	m := s.grow(n)
+	s.S = s.S[:m]
+}
+
+func (s *Uint64Slice) Resize(n int) {
+	m := n - s.Len()
+	if m > 0 {
+		s.Grow(m)
+	}
+	s.S = s.S[:n]
+}
+
+func (s *Uint64Slice) PoolGet() {
+	if !s.ubbp {
+		return
+	}
+	if s.S == nil {
+		s.S = forceconvSliceFromGoUint64(forceconv.BytesToUint64Slice(defaultByteBufferPool.Get().B[:0]))
+	}
+	if s.S == nil {
+		s.S = make([]Uint64, minSliceSize)
+	}
+}
+
+func (s *Uint64Slice) PoolPut() {
+	if !s.ubbp {
+		return
+	}
+	if s.S != nil {
+		defaultByteBufferPool.Put(&bytebufferpool.ByteBuffer{forceconv.Uint64SliceToBytes(s.GoSlice()[:0])})
+		s.S = nil
+	}
+}
+
+type Float32Slice struct {
+	S    []Float32
+	ubbp bool // use ByteBuffer Pool
+}
+
+func forceconvSliceFromGoFloat32(s []float32) []Float32 {
+	return *(*[]Float32)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s)).Data,
+		Len:  len(s),
+		Cap:  cap(s),
+	}))
+}
+func NewFloat32Slice(ubbp bool) Float32Slice {
+	return Float32Slice{nil, ubbp}
+}
+func NewFloat32SliceFromGoSlice(s []float32, ubbp bool) Float32Slice {
+	return Float32Slice{forceconvSliceFromGoFloat32(s), ubbp}
+}
+
+func (s Float32Slice) GoSlice() []float32 {
+	return *(*[]float32)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s.S)).Data,
+		Len:  s.Len(),
+		Cap:  s.Cap(),
+	}))
+}
+
+func (s Float32Slice) UseByteBufferPool() bool { return s.ubbp }
+
+func (s Float32Slice) Copy() Float32Slice {
+	buf := NewFloat32Slice(s.ubbp)
+	if s.ubbp {
+		buf.PoolGet()
+	}
+	buf.Resize(s.Len())
+	return buf
+}
+
+func (s Float32Slice) Type() Type { return ValTypes.Float32 }
+func (s Float32Slice) Len() int   { return len(s.S) }
+func (s Float32Slice) Cap() int   { return cap(s.S) }
+
+func (s *Float32Slice) Reset() {
+	s.S = s.S[:0]
+}
+
+func (s *Float32Slice) tryGrowByReslice(n int) (int, bool) {
+	if l := len(s.S); n <= cap(s.S)-l {
+		s.S = s.S[:l+n]
+		return l, true
+	}
+	return 0, false
+}
+
+func (s *Float32Slice) grow(n int) int {
+	m := s.Len()
+	if i, ok := s.tryGrowByReslice(n); ok {
+		return i
+	}
+	if s.S == nil && n <= minSliceSize {
+		if s.ubbp {
+			s.PoolGet()
+		} else {
+			s.S = make([]Float32, n, minSliceSize)
+		}
+		return 0
+	}
+	x := 1.25
+	c := s.Cap()
+	if c < 1024 {
+		x = 2
+	}
+	c = int(float64(c) * x)
+	if c >= (maxInt-n)/4 {
+		panic(ErrTooLarge)
+	} else {
+		buf := forceconvSliceFromGoFloat32(forceconv.BytesToFloat32Slice(makeByteSlice(c+n, 4)))
+		copy(buf, s.S)
+		if s.ubbp {
+			s.PoolPut()
+		}
+		s.S = buf
+	}
+	s.S = s.S[:m+n]
+	return m
+}
+
+func (s *Float32Slice) Grow(n int) {
+	if n < 0 {
+		panic("shunsukuda.goval.Float32Slice.Grow: negative count")
+	}
+	m := s.grow(n)
+	s.S = s.S[:m]
+}
+
+func (s *Float32Slice) Resize(n int) {
+	m := n - s.Len()
+	if m > 0 {
+		s.Grow(m)
+	}
+	s.S = s.S[:n]
+}
+
+func (s *Float32Slice) PoolGet() {
+	if !s.ubbp {
+		return
+	}
+	if s.S == nil {
+		s.S = forceconvSliceFromGoFloat32(forceconv.BytesToFloat32Slice(defaultByteBufferPool.Get().B[:0]))
+	}
+	if s.S == nil {
+		s.S = make([]Float32, minSliceSize)
+	}
+}
+
+func (s *Float32Slice) PoolPut() {
+	if !s.ubbp {
+		return
+	}
+	if s.S != nil {
+		defaultByteBufferPool.Put(&bytebufferpool.ByteBuffer{forceconv.Float32SliceToBytes(s.GoSlice()[:0])})
+		s.S = nil
+	}
+}
+
+type Float64Slice struct {
+	S    []Float64
+	ubbp bool // use ByteBuffer Pool
+}
+
+func forceconvSliceFromGoFloat64(s []float64) []Float64 {
+	return *(*[]Float64)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s)).Data,
+		Len:  len(s),
+		Cap:  cap(s),
+	}))
+}
+func NewFloat64Slice(ubbp bool) Float64Slice {
+	return Float64Slice{nil, ubbp}
+}
+func NewFloat64SliceFromGoSlice(s []float64, ubbp bool) Float64Slice {
+	return Float64Slice{forceconvSliceFromGoFloat64(s), ubbp}
+}
+
+func (s Float64Slice) GoSlice() []float64 {
+	return *(*[]float64)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s.S)).Data,
+		Len:  s.Len(),
+		Cap:  s.Cap(),
+	}))
+}
+
+func (s Float64Slice) UseByteBufferPool() bool { return s.ubbp }
+
+func (s Float64Slice) Copy() Float64Slice {
+	buf := NewFloat64Slice(s.ubbp)
+	if s.ubbp {
+		buf.PoolGet()
+	}
+	buf.Resize(s.Len())
+	return buf
+}
+
+func (s Float64Slice) Type() Type { return ValTypes.Float64 }
+func (s Float64Slice) Len() int   { return len(s.S) }
+func (s Float64Slice) Cap() int   { return cap(s.S) }
+
+func (s *Float64Slice) Reset() {
+	s.S = s.S[:0]
+}
+
+func (s *Float64Slice) tryGrowByReslice(n int) (int, bool) {
+	if l := len(s.S); n <= cap(s.S)-l {
+		s.S = s.S[:l+n]
+		return l, true
+	}
+	return 0, false
+}
+
+func (s *Float64Slice) grow(n int) int {
+	m := s.Len()
+	if i, ok := s.tryGrowByReslice(n); ok {
+		return i
+	}
+	if s.S == nil && n <= minSliceSize {
+		if s.ubbp {
+			s.PoolGet()
+		} else {
+			s.S = make([]Float64, n, minSliceSize)
+		}
+		return 0
+	}
+	x := 1.25
+	c := s.Cap()
+	if c < 1024 {
+		x = 2
+	}
+	c = int(float64(c) * x)
+	if c >= (maxInt-n)/8 {
+		panic(ErrTooLarge)
+	} else {
+		buf := forceconvSliceFromGoFloat64(forceconv.BytesToFloat64Slice(makeByteSlice(c+n, 8)))
+		copy(buf, s.S)
+		if s.ubbp {
+			s.PoolPut()
+		}
+		s.S = buf
+	}
+	s.S = s.S[:m+n]
+	return m
+}
+
+func (s *Float64Slice) Grow(n int) {
+	if n < 0 {
+		panic("shunsukuda.goval.Float64Slice.Grow: negative count")
+	}
+	m := s.grow(n)
+	s.S = s.S[:m]
+}
+
+func (s *Float64Slice) Resize(n int) {
+	m := n - s.Len()
+	if m > 0 {
+		s.Grow(m)
+	}
+	s.S = s.S[:n]
+}
+
+func (s *Float64Slice) PoolGet() {
+	if !s.ubbp {
+		return
+	}
+	if s.S == nil {
+		s.S = forceconvSliceFromGoFloat64(forceconv.BytesToFloat64Slice(defaultByteBufferPool.Get().B[:0]))
+	}
+	if s.S == nil {
+		s.S = make([]Float64, minSliceSize)
+	}
+}
+
+func (s *Float64Slice) PoolPut() {
+	if !s.ubbp {
+		return
+	}
+	if s.S != nil {
+		defaultByteBufferPool.Put(&bytebufferpool.ByteBuffer{forceconv.Float64SliceToBytes(s.GoSlice()[:0])})
+		s.S = nil
+	}
+}
+
+type Complex64Slice struct {
+	S    []Complex64
+	ubbp bool // use ByteBuffer Pool
+}
+
+func forceconvSliceFromGoComplex64(s []complex64) []Complex64 {
+	return *(*[]Complex64)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s)).Data,
+		Len:  len(s),
+		Cap:  cap(s),
+	}))
+}
+func NewComplex64Slice(ubbp bool) Complex64Slice {
+	return Complex64Slice{nil, ubbp}
+}
+func NewComplex64SliceFromGoSlice(s []complex64, ubbp bool) Complex64Slice {
+	return Complex64Slice{forceconvSliceFromGoComplex64(s), ubbp}
+}
+
+func (s Complex64Slice) GoSlice() []complex64 {
+	return *(*[]complex64)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s.S)).Data,
+		Len:  s.Len(),
+		Cap:  s.Cap(),
+	}))
+}
+
+func (s Complex64Slice) UseByteBufferPool() bool { return s.ubbp }
+
+func (s Complex64Slice) Copy() Complex64Slice {
+	buf := NewComplex64Slice(s.ubbp)
+	if s.ubbp {
+		buf.PoolGet()
+	}
+	buf.Resize(s.Len())
+	return buf
+}
+
+func (s Complex64Slice) Type() Type { return ValTypes.Complex64 }
+func (s Complex64Slice) Len() int   { return len(s.S) }
+func (s Complex64Slice) Cap() int   { return cap(s.S) }
+
+func (s *Complex64Slice) Reset() {
+	s.S = s.S[:0]
+}
+
+func (s *Complex64Slice) tryGrowByReslice(n int) (int, bool) {
+	if l := len(s.S); n <= cap(s.S)-l {
+		s.S = s.S[:l+n]
+		return l, true
+	}
+	return 0, false
+}
+
+func (s *Complex64Slice) grow(n int) int {
+	m := s.Len()
+	if i, ok := s.tryGrowByReslice(n); ok {
+		return i
+	}
+	if s.S == nil && n <= minSliceSize {
+		if s.ubbp {
+			s.PoolGet()
+		} else {
+			s.S = make([]Complex64, n, minSliceSize)
+		}
+		return 0
+	}
+	x := 1.25
+	c := s.Cap()
+	if c < 1024 {
+		x = 2
+	}
+	c = int(float64(c) * x)
+	if c >= (maxInt-n)/8 {
+		panic(ErrTooLarge)
+	} else {
+		buf := forceconvSliceFromGoComplex64(forceconv.BytesToComplex64Slice(makeByteSlice(c+n, 8)))
+		copy(buf, s.S)
+		if s.ubbp {
+			s.PoolPut()
+		}
+		s.S = buf
+	}
+	s.S = s.S[:m+n]
+	return m
+}
+
+func (s *Complex64Slice) Grow(n int) {
+	if n < 0 {
+		panic("shunsukuda.goval.Complex64Slice.Grow: negative count")
+	}
+	m := s.grow(n)
+	s.S = s.S[:m]
+}
+
+func (s *Complex64Slice) Resize(n int) {
+	m := n - s.Len()
+	if m > 0 {
+		s.Grow(m)
+	}
+	s.S = s.S[:n]
+}
+
+func (s *Complex64Slice) PoolGet() {
+	if !s.ubbp {
+		return
+	}
+	if s.S == nil {
+		s.S = forceconvSliceFromGoComplex64(forceconv.BytesToComplex64Slice(defaultByteBufferPool.Get().B[:0]))
+	}
+	if s.S == nil {
+		s.S = make([]Complex64, minSliceSize)
+	}
+}
+
+func (s *Complex64Slice) PoolPut() {
+	if !s.ubbp {
+		return
+	}
+	if s.S != nil {
+		defaultByteBufferPool.Put(&bytebufferpool.ByteBuffer{forceconv.Complex64SliceToBytes(s.GoSlice()[:0])})
+		s.S = nil
+	}
+}
+
+type Complex128Slice struct {
+	S    []Complex128
+	ubbp bool // use ByteBuffer Pool
+}
+
+func forceconvSliceFromGoComplex128(s []complex128) []Complex128 {
+	return *(*[]Complex128)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s)).Data,
+		Len:  len(s),
+		Cap:  cap(s),
+	}))
+}
+func NewComplex128Slice(ubbp bool) Complex128Slice {
+	return Complex128Slice{nil, ubbp}
+}
+func NewComplex128SliceFromGoSlice(s []complex128, ubbp bool) Complex128Slice {
+	return Complex128Slice{forceconvSliceFromGoComplex128(s), ubbp}
+}
+
+func (s Complex128Slice) GoSlice() []complex128 {
+	return *(*[]complex128)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.SliceHeader)(unsafe.Pointer(&s.S)).Data,
+		Len:  s.Len(),
+		Cap:  s.Cap(),
+	}))
+}
+
+func (s Complex128Slice) UseByteBufferPool() bool { return s.ubbp }
+
+func (s Complex128Slice) Copy() Complex128Slice {
+	buf := NewComplex128Slice(s.ubbp)
+	if s.ubbp {
+		buf.PoolGet()
+	}
+	buf.Resize(s.Len())
+	return buf
+}
+
+func (s Complex128Slice) Type() Type { return ValTypes.Complex128 }
+func (s Complex128Slice) Len() int   { return len(s.S) }
+func (s Complex128Slice) Cap() int   { return cap(s.S) }
+
+func (s *Complex128Slice) Reset() {
+	s.S = s.S[:0]
+}
+
+func (s *Complex128Slice) tryGrowByReslice(n int) (int, bool) {
+	if l := len(s.S); n <= cap(s.S)-l {
+		s.S = s.S[:l+n]
+		return l, true
+	}
+	return 0, false
+}
+
+func (s *Complex128Slice) grow(n int) int {
+	m := s.Len()
+	if i, ok := s.tryGrowByReslice(n); ok {
+		return i
+	}
+	if s.S == nil && n <= minSliceSize {
+		if s.ubbp {
+			s.PoolGet()
+		} else {
+			s.S = make([]Complex128, n, minSliceSize)
+		}
+		return 0
+	}
+	x := 1.25
+	c := s.Cap()
+	if c < 1024 {
+		x = 2
+	}
+	c = int(float64(c) * x)
+	if c >= (maxInt-n)/16 {
+		panic(ErrTooLarge)
+	} else {
+		buf := forceconvSliceFromGoComplex128(forceconv.BytesToComplex128Slice(makeByteSlice(c+n, 16)))
+		copy(buf, s.S)
+		if s.ubbp {
+			s.PoolPut()
+		}
+		s.S = buf
+	}
+	s.S = s.S[:m+n]
+	return m
+}
+
+func (s *Complex128Slice) Grow(n int) {
+	if n < 0 {
+		panic("shunsukuda.goval.Complex128Slice.Grow: negative count")
+	}
+	m := s.grow(n)
+	s.S = s.S[:m]
+}
+
+func (s *Complex128Slice) Resize(n int) {
+	m := n - s.Len()
+	if m > 0 {
+		s.Grow(m)
+	}
+	s.S = s.S[:n]
+}
+
+func (s *Complex128Slice) PoolGet() {
+	if !s.ubbp {
+		return
+	}
+	if s.S == nil {
+		s.S = forceconvSliceFromGoComplex128(forceconv.BytesToComplex128Slice(defaultByteBufferPool.Get().B[:0]))
+	}
+	if s.S == nil {
+		s.S = make([]Complex128, minSliceSize)
+	}
+}
+
+func (s *Complex128Slice) PoolPut() {
+	if !s.ubbp {
+		return
+	}
+	if s.S != nil {
+		defaultByteBufferPool.Put(&bytebufferpool.ByteBuffer{forceconv.Complex128SliceToBytes(s.GoSlice()[:0])})
+		s.S = nil
+	}
+}

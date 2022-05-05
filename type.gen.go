@@ -168,7 +168,7 @@ func (t Complex64Type) ID() int            { return TypeComplex64 }
 func (t Complex64Type) Kind() reflect.Kind { return reflect.Complex64 }
 func (t Complex64Type) Name() string       { return "Complex64" }
 func (t Complex64Type) String() string     { return "Complex64" }
-func (t Complex64Type) BitSize() int       { return 64 }
+func (t Complex64Type) BitSize() int       { return 32 }
 
 type Complex128Type struct{}
 
@@ -176,7 +176,7 @@ func (t Complex128Type) ID() int            { return TypeComplex128 }
 func (t Complex128Type) Kind() reflect.Kind { return reflect.Complex128 }
 func (t Complex128Type) Name() string       { return "Complex128" }
 func (t Complex128Type) String() string     { return "Complex128" }
-func (t Complex128Type) BitSize() int       { return 128 }
+func (t Complex128Type) BitSize() int       { return 64 }
 
 type StringType struct{}
 
