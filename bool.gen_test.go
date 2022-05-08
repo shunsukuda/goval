@@ -1,7 +1,6 @@
 package goval
 
 import (
-	"reflect"
 	"testing"
 )
 
@@ -15,7 +14,7 @@ func TestBool_Type(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.Type(); !reflect.DeepEqual(got, tt.want) {
+			if got := tt.e.Type(); !got.Equal(tt.want) {
 				t.Errorf("Bool.Equal() = %v, want %v", got, tt.want)
 			}
 		})

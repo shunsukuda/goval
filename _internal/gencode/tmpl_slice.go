@@ -56,9 +56,13 @@ func forceconvSliceFromGo{{$T.TypeName}}(s []{{$T.GoTypeName}}) []{{$T.TypeName}
 		Cap:  cap(s),
 	}))
 }
-func New{{$T.TypeName}}Slice(ubbp bool) {{$T.TypeName}}Slice {
-	return {{$T.TypeName}}Slice{nil, ubbp}
+
+func New{{$T.TypeName}}Slice(size int, ubbp bool) {{$T.TypeName}}Slice {
+	s := {{$T.TypeName}}Slice{nil, ubbp}
+	s.Resize(size)
+	return s
 }
+
 func New{{$T.TypeName}}SliceFromGoSlice(s []{{$T.GoTypeName}}, ubbp bool) {{$T.TypeName}}Slice {
 	return {{$T.TypeName}}Slice{forceconvSliceFromGo{{$T.TypeName}}(s), ubbp}
 }
@@ -74,11 +78,11 @@ func (s {{$T.TypeName}}Slice) GoSlice() []{{$T.GoTypeName}} {
 func (s {{$T.TypeName}}Slice) UseByteBufferPool() bool { return s.ubbp }
 
 func (s {{$T.TypeName}}Slice) Copy() {{$T.TypeName}}Slice {
-	buf := New{{$T.TypeName}}Slice(s.ubbp)
+	buf := New{{$T.TypeName}}Slice(s.Len(), s.ubbp)
 	if s.ubbp {
 		buf.PoolGet()
 	}
-	buf.Resize(s.Len())
+	copy(buf.S, s.S)
 	return buf
 }
 
@@ -103,7 +107,7 @@ func (s *{{$T.TypeName}}Slice) grow(n int) int {
 	if i, ok := s.tryGrowByReslice(n); ok {
 		return i
 	}
-	if s.S == nil && n <= minSliceSize {
+	if s.Cap() == 0 && n <= minSliceSize {
 		if s.ubbp {
 			s.PoolGet()
 		} else {
@@ -131,6 +135,7 @@ func (s *{{$T.TypeName}}Slice) grow(n int) int {
 	return m
 }
 
+// Grow grows the slice's capacity.
 func (s *{{$T.TypeName}}Slice) Grow(n int) {
 	if n < 0 {
 		panic("shunsukuda.goval.{{$T.TypeName}}Slice.Grow: negative count")
@@ -151,10 +156,11 @@ func (s *{{$T.TypeName}}Slice) PoolGet() {
 	if !s.ubbp {
 		return
 	}
-	if s.S == nil {
+	if s.Cap() == 0 {
 		s.S = forceconvSliceFromGo{{$T.TypeName}}(forceconv.BytesTo{{$T.TypeName}}Slice(defaultByteBufferPool.Get().B[:0]))
 	}
-	if s.S == nil {
+	if s.Cap() < minSliceSize {
+		s.PoolPut()
 		s.S = make([]{{$T.TypeName}}, minSliceSize)
 	}
 }
@@ -163,7 +169,7 @@ func (s *{{$T.TypeName}}Slice) PoolPut() {
 	if !s.ubbp {
 		return
 	}
-	if s.S != nil {
+	if s.Cap() > 0 {
 		defaultByteBufferPool.Put(&bytebufferpool.ByteBuffer{forceconv.{{$T.TypeName}}SliceToBytes(s.GoSlice()[:0])})
 		s.S = nil
 	}

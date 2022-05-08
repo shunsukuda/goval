@@ -95,18 +95,17 @@ type Complex128Converter interface {
 
 type StringConverter interface {
 	ToString() String
-	ToStringCheck() (String, bool)
+	ToStringFormat(format string) String
 }
 
 type BytesConverter interface {
 	ToBytes() Bytes
-	ToBytesCheck() (Bytes, bool)
+	ToBytesFormat(format string) Bytes
 }
 
 /*
 type TimeConverter interface {
 	ToTime() Time
-	ToTimeCheck() (Time, bool)
 }
 */
 
@@ -121,111 +120,3 @@ type ArrowTimeConverter interface {
 	ToArrowTime32() arrow.Time32
 	ToArrowTime64() arrow.Time64
 }
-
-func ToBool(x BoolConverter) Bool {
-	return x.ToBool()
-}
-
-func ToBoolA(x BoolConverter) (Bool, bool) {
-	return x.ToBoolEq()
-}
-
-func ToInt8(x Int8Converter) Int8 {
-	return x.ToInt8()
-}
-
-func ToInt8A(x Int8Converter) (Int8, bool) {
-	return x.ToInt8Eq()
-}
-
-func ToInt16(x Int16Converter) Int16 {
-	return x.ToInt16()
-}
-
-func ToInt16A(x Int16Converter) (Int16, bool) {
-	return x.ToInt16Eq()
-}
-
-func ToInt32(x Int32Converter) Int32 {
-	return x.ToInt32()
-}
-
-func ToInt32A(x Int32Converter) (Int32, bool) {
-	return x.ToInt32Eq()
-}
-
-func ToInt64(x Int64Converter) Int64 {
-	return x.ToInt64()
-}
-
-func ToInt64A(x Int64Converter) (Int64, bool) {
-	return x.ToInt64Eq()
-}
-
-func ToUint8(x Uint8Converter) Uint8 {
-	return x.ToUint8()
-}
-
-func ToUint8A(x Uint8Converter) (Uint8, bool) {
-	return x.ToUint8Eq()
-}
-
-func ToUint16(x Uint16Converter) Uint16 {
-	return x.ToUint16()
-}
-
-func ToUint16A(x Uint16Converter) (Uint16, bool) {
-	return x.ToUint16Eq()
-}
-
-func ToUint32(x Uint32Converter) Uint32 {
-	return x.ToUint32()
-}
-
-func ToUint32A(x Uint32Converter) (Uint32, bool) {
-	return x.ToUint32Eq()
-}
-
-func ToUint64(x Uint64Converter) Uint64 {
-	return x.ToUint64()
-}
-
-func ToUint64A(x Uint64Converter) (Uint64, bool) {
-	return x.ToUint64Eq()
-}
-
-func ToFloat32(x Float32Converter) Float32 {
-	return x.ToFloat32()
-}
-
-func ToFloat32A(x Float32Converter) (Float32, bool) {
-	return x.ToFloat32Eq()
-}
-
-func ToFloat64(x Float64Converter) Float64 {
-	return x.ToFloat64()
-}
-
-func ToFloat64A(x Float64Converter) (Float64, bool) {
-	return x.ToFloat64Eq()
-}
-
-func ToString(x StringConverter) String {
-	return x.ToString()
-}
-
-/*
-func ToStringEq(x StringConverter) (String, bool) {
-	return x.ToStringEq()
-}
-*/
-
-func ToBytes(x BytesConverter) Bytes {
-	return x.ToBytes()
-}
-
-/*
-func ToBytesEq(x BytesConverter) (Bytes, bool) {
-	return x.ToBytesEq()
-}
-*/

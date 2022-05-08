@@ -2,7 +2,6 @@ package goval
 
 import (
 	"math"
-	"reflect"
 	"testing"
 )
 
@@ -16,7 +15,7 @@ func TestInt8_Type(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.Type(); !reflect.DeepEqual(got, tt.want) {
+			if got := tt.e.Type(); !got.Equal(tt.want) {
 				t.Errorf("Int8.Type() = %v, want %v", got, tt.want)
 			}
 		})
@@ -506,67 +505,6 @@ func TestInt8_ToComplex128Eq(t *testing.T) {
 	}
 }
 
-func TestInt8_ToString(t *testing.T) {
-	tests := []struct {
-		name string
-		e    Int8
-
-		want String
-	}{
-		{name: "", e: Int8{123}, want: String{"123"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToString(); !got.Equal(tt.want) {
-				t.Errorf("Int8.ToString() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestInt8_ToStringBase(t *testing.T) {
-	type args struct {
-		base int
-	}
-	tests := []struct {
-		name string
-		e    Int8
-		args args
-		want String
-	}{
-		{name: "", e: Int8{123}, args: args{base: 10}, want: String{"123"}},
-		{name: "", e: Int8{123}, args: args{base: 16}, want: String{"7b"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringBase(tt.args.base); !got.Equal(tt.want) {
-				t.Errorf("Int8.ToStringBase() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestInt8_ToStringFormat(t *testing.T) {
-	type args struct {
-		format string
-	}
-	tests := []struct {
-		name string
-		e    Int8
-		args args
-		want String
-	}{
-		{name: "", e: Int8{123}, args: args{format: "v=%v"}, want: String{"v={123}"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
-				t.Errorf("Int8.ToStringFormat() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestInt8_ToBytes(t *testing.T) {
 	tests := []struct {
 		name string
@@ -628,6 +566,67 @@ func TestInt8_ToBytesFormat(t *testing.T) {
 	}
 }
 
+func TestInt8_ToString(t *testing.T) {
+	tests := []struct {
+		name string
+		e    Int8
+
+		want String
+	}{
+		{name: "", e: Int8{123}, want: String{"123"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToString(); !got.Equal(tt.want) {
+				t.Errorf("Int8.ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestInt8_ToStringBase(t *testing.T) {
+	type args struct {
+		base int
+	}
+	tests := []struct {
+		name string
+		e    Int8
+		args args
+		want String
+	}{
+		{name: "", e: Int8{123}, args: args{base: 10}, want: String{"123"}},
+		{name: "", e: Int8{123}, args: args{base: 16}, want: String{"7b"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringBase(tt.args.base); !got.Equal(tt.want) {
+				t.Errorf("Int8.ToStringBase() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestInt8_ToStringFormat(t *testing.T) {
+	type args struct {
+		format string
+	}
+	tests := []struct {
+		name string
+		e    Int8
+		args args
+		want String
+	}{
+		{name: "", e: Int8{123}, args: args{format: "v=%v"}, want: String{"v={123}"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
+				t.Errorf("Int8.ToStringFormat() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestInt16_Type(t *testing.T) {
 	tests := []struct {
 		name string
@@ -638,7 +637,7 @@ func TestInt16_Type(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.Type(); !reflect.DeepEqual(got, tt.want) {
+			if got := tt.e.Type(); !got.Equal(tt.want) {
 				t.Errorf("Int16.Type() = %v, want %v", got, tt.want)
 			}
 		})
@@ -1129,67 +1128,6 @@ func TestInt16_ToComplex128Eq(t *testing.T) {
 	}
 }
 
-func TestInt16_ToString(t *testing.T) {
-	tests := []struct {
-		name string
-		e    Int16
-
-		want String
-	}{
-		{name: "", e: Int16{123}, want: String{"123"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToString(); !got.Equal(tt.want) {
-				t.Errorf("Int16.ToString() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestInt16_ToStringBase(t *testing.T) {
-	type args struct {
-		base int
-	}
-	tests := []struct {
-		name string
-		e    Int16
-		args args
-		want String
-	}{
-		{name: "", e: Int16{123}, args: args{base: 10}, want: String{"123"}},
-		{name: "", e: Int16{123}, args: args{base: 16}, want: String{"7b"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringBase(tt.args.base); !got.Equal(tt.want) {
-				t.Errorf("Int16.ToStringBase() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestInt16_ToStringFormat(t *testing.T) {
-	type args struct {
-		format string
-	}
-	tests := []struct {
-		name string
-		e    Int16
-		args args
-		want String
-	}{
-		{name: "", e: Int16{123}, args: args{format: "v=%v"}, want: String{"v={123}"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
-				t.Errorf("Int16.ToStringFormat() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestInt16_ToBytes(t *testing.T) {
 	tests := []struct {
 		name string
@@ -1251,6 +1189,67 @@ func TestInt16_ToBytesFormat(t *testing.T) {
 	}
 }
 
+func TestInt16_ToString(t *testing.T) {
+	tests := []struct {
+		name string
+		e    Int16
+
+		want String
+	}{
+		{name: "", e: Int16{123}, want: String{"123"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToString(); !got.Equal(tt.want) {
+				t.Errorf("Int16.ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestInt16_ToStringBase(t *testing.T) {
+	type args struct {
+		base int
+	}
+	tests := []struct {
+		name string
+		e    Int16
+		args args
+		want String
+	}{
+		{name: "", e: Int16{123}, args: args{base: 10}, want: String{"123"}},
+		{name: "", e: Int16{123}, args: args{base: 16}, want: String{"7b"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringBase(tt.args.base); !got.Equal(tt.want) {
+				t.Errorf("Int16.ToStringBase() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestInt16_ToStringFormat(t *testing.T) {
+	type args struct {
+		format string
+	}
+	tests := []struct {
+		name string
+		e    Int16
+		args args
+		want String
+	}{
+		{name: "", e: Int16{123}, args: args{format: "v=%v"}, want: String{"v={123}"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
+				t.Errorf("Int16.ToStringFormat() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestInt32_Type(t *testing.T) {
 	tests := []struct {
 		name string
@@ -1261,7 +1260,7 @@ func TestInt32_Type(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.Type(); !reflect.DeepEqual(got, tt.want) {
+			if got := tt.e.Type(); !got.Equal(tt.want) {
 				t.Errorf("Int32.Type() = %v, want %v", got, tt.want)
 			}
 		})
@@ -1755,67 +1754,6 @@ func TestInt32_ToComplex128Eq(t *testing.T) {
 	}
 }
 
-func TestInt32_ToString(t *testing.T) {
-	tests := []struct {
-		name string
-		e    Int32
-
-		want String
-	}{
-		{name: "", e: Int32{123}, want: String{"123"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToString(); !got.Equal(tt.want) {
-				t.Errorf("Int32.ToString() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestInt32_ToStringBase(t *testing.T) {
-	type args struct {
-		base int
-	}
-	tests := []struct {
-		name string
-		e    Int32
-		args args
-		want String
-	}{
-		{name: "", e: Int32{123}, args: args{base: 10}, want: String{"123"}},
-		{name: "", e: Int32{123}, args: args{base: 16}, want: String{"7b"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringBase(tt.args.base); !got.Equal(tt.want) {
-				t.Errorf("Int32.ToStringBase() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestInt32_ToStringFormat(t *testing.T) {
-	type args struct {
-		format string
-	}
-	tests := []struct {
-		name string
-		e    Int32
-		args args
-		want String
-	}{
-		{name: "", e: Int32{123}, args: args{format: "v=%v"}, want: String{"v={123}"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
-				t.Errorf("Int32.ToStringFormat() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestInt32_ToBytes(t *testing.T) {
 	tests := []struct {
 		name string
@@ -1877,6 +1815,67 @@ func TestInt32_ToBytesFormat(t *testing.T) {
 	}
 }
 
+func TestInt32_ToString(t *testing.T) {
+	tests := []struct {
+		name string
+		e    Int32
+
+		want String
+	}{
+		{name: "", e: Int32{123}, want: String{"123"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToString(); !got.Equal(tt.want) {
+				t.Errorf("Int32.ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestInt32_ToStringBase(t *testing.T) {
+	type args struct {
+		base int
+	}
+	tests := []struct {
+		name string
+		e    Int32
+		args args
+		want String
+	}{
+		{name: "", e: Int32{123}, args: args{base: 10}, want: String{"123"}},
+		{name: "", e: Int32{123}, args: args{base: 16}, want: String{"7b"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringBase(tt.args.base); !got.Equal(tt.want) {
+				t.Errorf("Int32.ToStringBase() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestInt32_ToStringFormat(t *testing.T) {
+	type args struct {
+		format string
+	}
+	tests := []struct {
+		name string
+		e    Int32
+		args args
+		want String
+	}{
+		{name: "", e: Int32{123}, args: args{format: "v=%v"}, want: String{"v={123}"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
+				t.Errorf("Int32.ToStringFormat() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestInt64_Type(t *testing.T) {
 	tests := []struct {
 		name string
@@ -1887,7 +1886,7 @@ func TestInt64_Type(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.Type(); !reflect.DeepEqual(got, tt.want) {
+			if got := tt.e.Type(); !got.Equal(tt.want) {
 				t.Errorf("Int64.Type() = %v, want %v", got, tt.want)
 			}
 		})
@@ -2384,67 +2383,6 @@ func TestInt64_ToComplex128Eq(t *testing.T) {
 	}
 }
 
-func TestInt64_ToString(t *testing.T) {
-	tests := []struct {
-		name string
-		e    Int64
-
-		want String
-	}{
-		{name: "", e: Int64{123}, want: String{"123"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToString(); !got.Equal(tt.want) {
-				t.Errorf("Int64.ToString() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestInt64_ToStringBase(t *testing.T) {
-	type args struct {
-		base int
-	}
-	tests := []struct {
-		name string
-		e    Int64
-		args args
-		want String
-	}{
-		{name: "", e: Int64{123}, args: args{base: 10}, want: String{"123"}},
-		{name: "", e: Int64{123}, args: args{base: 16}, want: String{"7b"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringBase(tt.args.base); !got.Equal(tt.want) {
-				t.Errorf("Int64.ToStringBase() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestInt64_ToStringFormat(t *testing.T) {
-	type args struct {
-		format string
-	}
-	tests := []struct {
-		name string
-		e    Int64
-		args args
-		want String
-	}{
-		{name: "", e: Int64{123}, args: args{format: "v=%v"}, want: String{"v={123}"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
-				t.Errorf("Int64.ToStringFormat() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestInt64_ToBytes(t *testing.T) {
 	tests := []struct {
 		name string
@@ -2506,6 +2444,67 @@ func TestInt64_ToBytesFormat(t *testing.T) {
 	}
 }
 
+func TestInt64_ToString(t *testing.T) {
+	tests := []struct {
+		name string
+		e    Int64
+
+		want String
+	}{
+		{name: "", e: Int64{123}, want: String{"123"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToString(); !got.Equal(tt.want) {
+				t.Errorf("Int64.ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestInt64_ToStringBase(t *testing.T) {
+	type args struct {
+		base int
+	}
+	tests := []struct {
+		name string
+		e    Int64
+		args args
+		want String
+	}{
+		{name: "", e: Int64{123}, args: args{base: 10}, want: String{"123"}},
+		{name: "", e: Int64{123}, args: args{base: 16}, want: String{"7b"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringBase(tt.args.base); !got.Equal(tt.want) {
+				t.Errorf("Int64.ToStringBase() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestInt64_ToStringFormat(t *testing.T) {
+	type args struct {
+		format string
+	}
+	tests := []struct {
+		name string
+		e    Int64
+		args args
+		want String
+	}{
+		{name: "", e: Int64{123}, args: args{format: "v=%v"}, want: String{"v={123}"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
+				t.Errorf("Int64.ToStringFormat() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestUint8_Type(t *testing.T) {
 	tests := []struct {
 		name string
@@ -2516,7 +2515,7 @@ func TestUint8_Type(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.Type(); !reflect.DeepEqual(got, tt.want) {
+			if got := tt.e.Type(); !got.Equal(tt.want) {
 				t.Errorf("Uint8.Type() = %v, want %v", got, tt.want)
 			}
 		})
@@ -3003,67 +3002,6 @@ func TestUint8_ToComplex128Eq(t *testing.T) {
 	}
 }
 
-func TestUint8_ToString(t *testing.T) {
-	tests := []struct {
-		name string
-		e    Uint8
-
-		want String
-	}{
-		{name: "", e: Uint8{123}, want: String{"123"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToString(); !got.Equal(tt.want) {
-				t.Errorf("Uint8.ToString() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestUint8_ToStringBase(t *testing.T) {
-	type args struct {
-		base int
-	}
-	tests := []struct {
-		name string
-		e    Uint8
-		args args
-		want String
-	}{
-		{name: "", e: Uint8{123}, args: args{base: 10}, want: String{"123"}},
-		{name: "", e: Uint8{123}, args: args{base: 16}, want: String{"7b"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringBase(tt.args.base); !got.Equal(tt.want) {
-				t.Errorf("Uint8.ToStringBase() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestUint8_ToStringFormat(t *testing.T) {
-	type args struct {
-		format string
-	}
-	tests := []struct {
-		name string
-		e    Uint8
-		args args
-		want String
-	}{
-		{name: "", e: Uint8{123}, args: args{format: "v=%v"}, want: String{"v={123}"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
-				t.Errorf("Uint8.ToStringFormat() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestUint8_ToBytes(t *testing.T) {
 	tests := []struct {
 		name string
@@ -3125,6 +3063,67 @@ func TestUint8_ToBytesFormat(t *testing.T) {
 	}
 }
 
+func TestUint8_ToString(t *testing.T) {
+	tests := []struct {
+		name string
+		e    Uint8
+
+		want String
+	}{
+		{name: "", e: Uint8{123}, want: String{"123"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToString(); !got.Equal(tt.want) {
+				t.Errorf("Uint8.ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestUint8_ToStringBase(t *testing.T) {
+	type args struct {
+		base int
+	}
+	tests := []struct {
+		name string
+		e    Uint8
+		args args
+		want String
+	}{
+		{name: "", e: Uint8{123}, args: args{base: 10}, want: String{"123"}},
+		{name: "", e: Uint8{123}, args: args{base: 16}, want: String{"7b"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringBase(tt.args.base); !got.Equal(tt.want) {
+				t.Errorf("Uint8.ToStringBase() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestUint8_ToStringFormat(t *testing.T) {
+	type args struct {
+		format string
+	}
+	tests := []struct {
+		name string
+		e    Uint8
+		args args
+		want String
+	}{
+		{name: "", e: Uint8{123}, args: args{format: "v=%v"}, want: String{"v={123}"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
+				t.Errorf("Uint8.ToStringFormat() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestUint16_Type(t *testing.T) {
 	tests := []struct {
 		name string
@@ -3135,7 +3134,7 @@ func TestUint16_Type(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.Type(); !reflect.DeepEqual(got, tt.want) {
+			if got := tt.e.Type(); !got.Equal(tt.want) {
 				t.Errorf("Uint16.Type() = %v, want %v", got, tt.want)
 			}
 		})
@@ -3624,67 +3623,6 @@ func TestUint16_ToComplex128Eq(t *testing.T) {
 	}
 }
 
-func TestUint16_ToString(t *testing.T) {
-	tests := []struct {
-		name string
-		e    Uint16
-
-		want String
-	}{
-		{name: "", e: Uint16{123}, want: String{"123"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToString(); !got.Equal(tt.want) {
-				t.Errorf("Uint16.ToString() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestUint16_ToStringBase(t *testing.T) {
-	type args struct {
-		base int
-	}
-	tests := []struct {
-		name string
-		e    Uint16
-		args args
-		want String
-	}{
-		{name: "", e: Uint16{123}, args: args{base: 10}, want: String{"123"}},
-		{name: "", e: Uint16{123}, args: args{base: 16}, want: String{"7b"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringBase(tt.args.base); !got.Equal(tt.want) {
-				t.Errorf("Uint16.ToStringBase() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestUint16_ToStringFormat(t *testing.T) {
-	type args struct {
-		format string
-	}
-	tests := []struct {
-		name string
-		e    Uint16
-		args args
-		want String
-	}{
-		{name: "", e: Uint16{123}, args: args{format: "v=%v"}, want: String{"v={123}"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
-				t.Errorf("Uint16.ToStringFormat() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestUint16_ToBytes(t *testing.T) {
 	tests := []struct {
 		name string
@@ -3746,6 +3684,67 @@ func TestUint16_ToBytesFormat(t *testing.T) {
 	}
 }
 
+func TestUint16_ToString(t *testing.T) {
+	tests := []struct {
+		name string
+		e    Uint16
+
+		want String
+	}{
+		{name: "", e: Uint16{123}, want: String{"123"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToString(); !got.Equal(tt.want) {
+				t.Errorf("Uint16.ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestUint16_ToStringBase(t *testing.T) {
+	type args struct {
+		base int
+	}
+	tests := []struct {
+		name string
+		e    Uint16
+		args args
+		want String
+	}{
+		{name: "", e: Uint16{123}, args: args{base: 10}, want: String{"123"}},
+		{name: "", e: Uint16{123}, args: args{base: 16}, want: String{"7b"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringBase(tt.args.base); !got.Equal(tt.want) {
+				t.Errorf("Uint16.ToStringBase() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestUint16_ToStringFormat(t *testing.T) {
+	type args struct {
+		format string
+	}
+	tests := []struct {
+		name string
+		e    Uint16
+		args args
+		want String
+	}{
+		{name: "", e: Uint16{123}, args: args{format: "v=%v"}, want: String{"v={123}"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
+				t.Errorf("Uint16.ToStringFormat() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestUint32_Type(t *testing.T) {
 	tests := []struct {
 		name string
@@ -3756,7 +3755,7 @@ func TestUint32_Type(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.Type(); !reflect.DeepEqual(got, tt.want) {
+			if got := tt.e.Type(); !got.Equal(tt.want) {
 				t.Errorf("Uint32.Type() = %v, want %v", got, tt.want)
 			}
 		})
@@ -4249,67 +4248,6 @@ func TestUint32_ToComplex128Eq(t *testing.T) {
 	}
 }
 
-func TestUint32_ToString(t *testing.T) {
-	tests := []struct {
-		name string
-		e    Uint32
-
-		want String
-	}{
-		{name: "", e: Uint32{123}, want: String{"123"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToString(); !got.Equal(tt.want) {
-				t.Errorf("Uint32.ToString() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestUint32_ToStringBase(t *testing.T) {
-	type args struct {
-		base int
-	}
-	tests := []struct {
-		name string
-		e    Uint32
-		args args
-		want String
-	}{
-		{name: "", e: Uint32{123}, args: args{base: 10}, want: String{"123"}},
-		{name: "", e: Uint32{123}, args: args{base: 16}, want: String{"7b"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringBase(tt.args.base); !got.Equal(tt.want) {
-				t.Errorf("Uint32.ToStringBase() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestUint32_ToStringFormat(t *testing.T) {
-	type args struct {
-		format string
-	}
-	tests := []struct {
-		name string
-		e    Uint32
-		args args
-		want String
-	}{
-		{name: "", e: Uint32{123}, args: args{format: "v=%v"}, want: String{"v={123}"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
-				t.Errorf("Uint32.ToStringFormat() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestUint32_ToBytes(t *testing.T) {
 	tests := []struct {
 		name string
@@ -4371,6 +4309,67 @@ func TestUint32_ToBytesFormat(t *testing.T) {
 	}
 }
 
+func TestUint32_ToString(t *testing.T) {
+	tests := []struct {
+		name string
+		e    Uint32
+
+		want String
+	}{
+		{name: "", e: Uint32{123}, want: String{"123"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToString(); !got.Equal(tt.want) {
+				t.Errorf("Uint32.ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestUint32_ToStringBase(t *testing.T) {
+	type args struct {
+		base int
+	}
+	tests := []struct {
+		name string
+		e    Uint32
+		args args
+		want String
+	}{
+		{name: "", e: Uint32{123}, args: args{base: 10}, want: String{"123"}},
+		{name: "", e: Uint32{123}, args: args{base: 16}, want: String{"7b"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringBase(tt.args.base); !got.Equal(tt.want) {
+				t.Errorf("Uint32.ToStringBase() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestUint32_ToStringFormat(t *testing.T) {
+	type args struct {
+		format string
+	}
+	tests := []struct {
+		name string
+		e    Uint32
+		args args
+		want String
+	}{
+		{name: "", e: Uint32{123}, args: args{format: "v=%v"}, want: String{"v={123}"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
+				t.Errorf("Uint32.ToStringFormat() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestUint64_Type(t *testing.T) {
 	tests := []struct {
 		name string
@@ -4381,7 +4380,7 @@ func TestUint64_Type(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.Type(); !reflect.DeepEqual(got, tt.want) {
+			if got := tt.e.Type(); !got.Equal(tt.want) {
 				t.Errorf("Uint64.Type() = %v, want %v", got, tt.want)
 			}
 		})
@@ -4878,67 +4877,6 @@ func TestUint64_ToComplex128Eq(t *testing.T) {
 	}
 }
 
-func TestUint64_ToString(t *testing.T) {
-	tests := []struct {
-		name string
-		e    Uint64
-
-		want String
-	}{
-		{name: "", e: Uint64{123}, want: String{"123"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToString(); !got.Equal(tt.want) {
-				t.Errorf("Uint64.ToString() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestUint64_ToStringBase(t *testing.T) {
-	type args struct {
-		base int
-	}
-	tests := []struct {
-		name string
-		e    Uint64
-		args args
-		want String
-	}{
-		{name: "", e: Uint64{123}, args: args{base: 10}, want: String{"123"}},
-		{name: "", e: Uint64{123}, args: args{base: 16}, want: String{"7b"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringBase(tt.args.base); !got.Equal(tt.want) {
-				t.Errorf("Uint64.ToStringBase() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestUint64_ToStringFormat(t *testing.T) {
-	type args struct {
-		format string
-	}
-	tests := []struct {
-		name string
-		e    Uint64
-		args args
-		want String
-	}{
-		{name: "", e: Uint64{123}, args: args{format: "v=%v"}, want: String{"v={123}"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
-				t.Errorf("Uint64.ToStringFormat() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestUint64_ToBytes(t *testing.T) {
 	tests := []struct {
 		name string
@@ -5000,6 +4938,67 @@ func TestUint64_ToBytesFormat(t *testing.T) {
 	}
 }
 
+func TestUint64_ToString(t *testing.T) {
+	tests := []struct {
+		name string
+		e    Uint64
+
+		want String
+	}{
+		{name: "", e: Uint64{123}, want: String{"123"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToString(); !got.Equal(tt.want) {
+				t.Errorf("Uint64.ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestUint64_ToStringBase(t *testing.T) {
+	type args struct {
+		base int
+	}
+	tests := []struct {
+		name string
+		e    Uint64
+		args args
+		want String
+	}{
+		{name: "", e: Uint64{123}, args: args{base: 10}, want: String{"123"}},
+		{name: "", e: Uint64{123}, args: args{base: 16}, want: String{"7b"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringBase(tt.args.base); !got.Equal(tt.want) {
+				t.Errorf("Uint64.ToStringBase() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestUint64_ToStringFormat(t *testing.T) {
+	type args struct {
+		format string
+	}
+	tests := []struct {
+		name string
+		e    Uint64
+		args args
+		want String
+	}{
+		{name: "", e: Uint64{123}, args: args{format: "v=%v"}, want: String{"v={123}"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
+				t.Errorf("Uint64.ToStringFormat() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestFloat32_Type(t *testing.T) {
 	tests := []struct {
 		name string
@@ -5010,7 +5009,7 @@ func TestFloat32_Type(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.Type(); !reflect.DeepEqual(got, tt.want) {
+			if got := tt.e.Type(); !got.Equal(tt.want) {
 				t.Errorf("Float32.Type() = %v, want %v", got, tt.want)
 			}
 		})
@@ -5504,112 +5503,6 @@ func TestFloat32_ToComplex128Eq(t *testing.T) {
 	}
 }
 
-func TestFloat32_ToString(t *testing.T) {
-	tests := []struct {
-		name string
-		e    Float32
-
-		want String
-	}{
-		{name: "", e: Float32{123}, want: String{"123"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToString(); !got.Equal(tt.want) {
-				t.Errorf("Float32.ToString() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestFloat32_ToStringFmt(t *testing.T) {
-	type args struct {
-		fmt byte
-	}
-	tests := []struct {
-		name string
-		e    Float32
-		args args
-		want String
-	}{
-		{name: "", e: Float32{123.456}, args: args{fmt: 'e'}, want: String{"1.23456e+02"}},
-		{name: "", e: Float32{123.456}, args: args{fmt: 'E'}, want: String{"1.23456E+02"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringFmt(tt.args.fmt); !got.Equal(tt.want) {
-				t.Errorf("Float32.ToStringFmt() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestFloat32_ToStringPrec(t *testing.T) {
-	type args struct {
-		prec int
-	}
-	tests := []struct {
-		name string
-		e    Float32
-		args args
-		want String
-	}{
-		{name: "", e: Float32{123.456}, args: args{prec: 3}, want: String{"123"}},
-		{name: "", e: Float32{123.456}, args: args{prec: 4}, want: String{"123.5"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringPrec(tt.args.prec); !got.Equal(tt.want) {
-				t.Errorf("Float32.ToStringPrec() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestFloat32_ToStringFmtPrec(t *testing.T) {
-	type args struct {
-		fmt  byte
-		prec int
-	}
-	tests := []struct {
-		name string
-		e    Float32
-		args args
-		want String
-	}{
-		{name: "", e: Float32{123.456}, args: args{fmt: 'e', prec: 3}, want: String{"1.235e+02"}},
-		{name: "", e: Float32{123.456}, args: args{fmt: 'e', prec: 4}, want: String{"1.2346e+02"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringFmtPrec(tt.args.fmt, tt.args.prec); !got.Equal(tt.want) {
-				t.Errorf("Float32.ToStringFmtPrec() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestFloat32_ToStringFormat(t *testing.T) {
-	type args struct {
-		format string
-	}
-	tests := []struct {
-		name string
-		e    Float32
-		args args
-		want String
-	}{
-		{name: "", e: Float32{123}, args: args{format: "v=%v"}, want: String{"v={123}"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
-				t.Errorf("Float32.ToStringFormat() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestFloat32_ToBytes(t *testing.T) {
 	tests := []struct {
 		name string
@@ -5716,6 +5609,112 @@ func TestFloat32_ToBytesFormat(t *testing.T) {
 	}
 }
 
+func TestFloat32_ToString(t *testing.T) {
+	tests := []struct {
+		name string
+		e    Float32
+
+		want String
+	}{
+		{name: "", e: Float32{123}, want: String{"123"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToString(); !got.Equal(tt.want) {
+				t.Errorf("Float32.ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFloat32_ToStringFmt(t *testing.T) {
+	type args struct {
+		fmt byte
+	}
+	tests := []struct {
+		name string
+		e    Float32
+		args args
+		want String
+	}{
+		{name: "", e: Float32{123.456}, args: args{fmt: 'e'}, want: String{"1.23456e+02"}},
+		{name: "", e: Float32{123.456}, args: args{fmt: 'E'}, want: String{"1.23456E+02"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringFmt(tt.args.fmt); !got.Equal(tt.want) {
+				t.Errorf("Float32.ToStringFmt() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFloat32_ToStringPrec(t *testing.T) {
+	type args struct {
+		prec int
+	}
+	tests := []struct {
+		name string
+		e    Float32
+		args args
+		want String
+	}{
+		{name: "", e: Float32{123.456}, args: args{prec: 3}, want: String{"123"}},
+		{name: "", e: Float32{123.456}, args: args{prec: 4}, want: String{"123.5"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringPrec(tt.args.prec); !got.Equal(tt.want) {
+				t.Errorf("Float32.ToStringPrec() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFloat32_ToStringFmtPrec(t *testing.T) {
+	type args struct {
+		fmt  byte
+		prec int
+	}
+	tests := []struct {
+		name string
+		e    Float32
+		args args
+		want String
+	}{
+		{name: "", e: Float32{123.456}, args: args{fmt: 'e', prec: 3}, want: String{"1.235e+02"}},
+		{name: "", e: Float32{123.456}, args: args{fmt: 'e', prec: 4}, want: String{"1.2346e+02"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringFmtPrec(tt.args.fmt, tt.args.prec); !got.Equal(tt.want) {
+				t.Errorf("Float32.ToStringFmtPrec() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFloat32_ToStringFormat(t *testing.T) {
+	type args struct {
+		format string
+	}
+	tests := []struct {
+		name string
+		e    Float32
+		args args
+		want String
+	}{
+		{name: "", e: Float32{123}, args: args{format: "v=%v"}, want: String{"v={123}"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
+				t.Errorf("Float32.ToStringFormat() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestFloat64_Type(t *testing.T) {
 	tests := []struct {
 		name string
@@ -5726,7 +5725,7 @@ func TestFloat64_Type(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.Type(); !reflect.DeepEqual(got, tt.want) {
+			if got := tt.e.Type(); !got.Equal(tt.want) {
 				t.Errorf("Float64.Type() = %v, want %v", got, tt.want)
 			}
 		})
@@ -6220,112 +6219,6 @@ func TestFloat64_ToComplex128Eq(t *testing.T) {
 	}
 }
 
-func TestFloat64_ToString(t *testing.T) {
-	tests := []struct {
-		name string
-		e    Float64
-
-		want String
-	}{
-		{name: "", e: Float64{123}, want: String{"123"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToString(); !got.Equal(tt.want) {
-				t.Errorf("Float64.ToString() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestFloat64_ToStringFmt(t *testing.T) {
-	type args struct {
-		fmt byte
-	}
-	tests := []struct {
-		name string
-		e    Float64
-		args args
-		want String
-	}{
-		{name: "", e: Float64{123.456}, args: args{fmt: 'e'}, want: String{"1.23456e+02"}},
-		{name: "", e: Float64{123.456}, args: args{fmt: 'E'}, want: String{"1.23456E+02"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringFmt(tt.args.fmt); !got.Equal(tt.want) {
-				t.Errorf("Float64.ToStringFmt() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestFloat64_ToStringPrec(t *testing.T) {
-	type args struct {
-		prec int
-	}
-	tests := []struct {
-		name string
-		e    Float64
-		args args
-		want String
-	}{
-		{name: "", e: Float64{123.456}, args: args{prec: 3}, want: String{"123"}},
-		{name: "", e: Float64{123.456}, args: args{prec: 4}, want: String{"123.5"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringPrec(tt.args.prec); !got.Equal(tt.want) {
-				t.Errorf("Float64.ToStringPrec() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestFloat64_ToStringFmtPrec(t *testing.T) {
-	type args struct {
-		fmt  byte
-		prec int
-	}
-	tests := []struct {
-		name string
-		e    Float64
-		args args
-		want String
-	}{
-		{name: "", e: Float64{123.456}, args: args{fmt: 'e', prec: 3}, want: String{"1.235e+02"}},
-		{name: "", e: Float64{123.456}, args: args{fmt: 'e', prec: 4}, want: String{"1.2346e+02"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringFmtPrec(tt.args.fmt, tt.args.prec); !got.Equal(tt.want) {
-				t.Errorf("Float64.ToStringFmtPrec() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestFloat64_ToStringFormat(t *testing.T) {
-	type args struct {
-		format string
-	}
-	tests := []struct {
-		name string
-		e    Float64
-		args args
-		want String
-	}{
-		{name: "", e: Float64{123}, args: args{format: "v=%v"}, want: String{"v={123}"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
-				t.Errorf("Float64.ToStringFormat() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestFloat64_ToBytes(t *testing.T) {
 	tests := []struct {
 		name string
@@ -6432,6 +6325,112 @@ func TestFloat64_ToBytesFormat(t *testing.T) {
 	}
 }
 
+func TestFloat64_ToString(t *testing.T) {
+	tests := []struct {
+		name string
+		e    Float64
+
+		want String
+	}{
+		{name: "", e: Float64{123}, want: String{"123"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToString(); !got.Equal(tt.want) {
+				t.Errorf("Float64.ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFloat64_ToStringFmt(t *testing.T) {
+	type args struct {
+		fmt byte
+	}
+	tests := []struct {
+		name string
+		e    Float64
+		args args
+		want String
+	}{
+		{name: "", e: Float64{123.456}, args: args{fmt: 'e'}, want: String{"1.23456e+02"}},
+		{name: "", e: Float64{123.456}, args: args{fmt: 'E'}, want: String{"1.23456E+02"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringFmt(tt.args.fmt); !got.Equal(tt.want) {
+				t.Errorf("Float64.ToStringFmt() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFloat64_ToStringPrec(t *testing.T) {
+	type args struct {
+		prec int
+	}
+	tests := []struct {
+		name string
+		e    Float64
+		args args
+		want String
+	}{
+		{name: "", e: Float64{123.456}, args: args{prec: 3}, want: String{"123"}},
+		{name: "", e: Float64{123.456}, args: args{prec: 4}, want: String{"123.5"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringPrec(tt.args.prec); !got.Equal(tt.want) {
+				t.Errorf("Float64.ToStringPrec() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFloat64_ToStringFmtPrec(t *testing.T) {
+	type args struct {
+		fmt  byte
+		prec int
+	}
+	tests := []struct {
+		name string
+		e    Float64
+		args args
+		want String
+	}{
+		{name: "", e: Float64{123.456}, args: args{fmt: 'e', prec: 3}, want: String{"1.235e+02"}},
+		{name: "", e: Float64{123.456}, args: args{fmt: 'e', prec: 4}, want: String{"1.2346e+02"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringFmtPrec(tt.args.fmt, tt.args.prec); !got.Equal(tt.want) {
+				t.Errorf("Float64.ToStringFmtPrec() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFloat64_ToStringFormat(t *testing.T) {
+	type args struct {
+		format string
+	}
+	tests := []struct {
+		name string
+		e    Float64
+		args args
+		want String
+	}{
+		{name: "", e: Float64{123}, args: args{format: "v=%v"}, want: String{"v={123}"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
+				t.Errorf("Float64.ToStringFormat() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestComplex64_Type(t *testing.T) {
 	tests := []struct {
 		name string
@@ -6442,7 +6441,7 @@ func TestComplex64_Type(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.Type(); !reflect.DeepEqual(got, tt.want) {
+			if got := tt.e.Type(); !got.Equal(tt.want) {
 				t.Errorf("Complex64.Type() = %v, want %v", got, tt.want)
 			}
 		})
@@ -6970,112 +6969,6 @@ func TestComplex64_ToComplex128Eq(t *testing.T) {
 	}
 }
 
-func TestComplex64_ToString(t *testing.T) {
-	tests := []struct {
-		name string
-		e    Complex64
-
-		want String
-	}{
-		{name: "", e: Complex64{123}, want: String{"(123+0i)"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToString(); !got.Equal(tt.want) {
-				t.Errorf("Complex64.ToString() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestComplex64_ToStringFmt(t *testing.T) {
-	type args struct {
-		fmt byte
-	}
-	tests := []struct {
-		name string
-		e    Complex64
-		args args
-		want String
-	}{
-		{name: "", e: Complex64{123.456}, args: args{fmt: 'e'}, want: String{"(1.23456e+02+0e+00i)"}},
-		{name: "", e: Complex64{123.456}, args: args{fmt: 'E'}, want: String{"(1.23456E+02+0E+00i)"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringFmt(tt.args.fmt); !got.Equal(tt.want) {
-				t.Errorf("Complex64.ToStringFmt() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestComplex64_ToStringPrec(t *testing.T) {
-	type args struct {
-		prec int
-	}
-	tests := []struct {
-		name string
-		e    Complex64
-		args args
-		want String
-	}{
-		{name: "", e: Complex64{123.456}, args: args{prec: 3}, want: String{"(123+0i)"}},
-		{name: "", e: Complex64{123.456}, args: args{prec: 4}, want: String{"(123.5+0i)"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringPrec(tt.args.prec); !got.Equal(tt.want) {
-				t.Errorf("Complex64.ToStringPrec() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestComplex64_ToStringFmtPrec(t *testing.T) {
-	type args struct {
-		fmt  byte
-		prec int
-	}
-	tests := []struct {
-		name string
-		e    Complex64
-		args args
-		want String
-	}{
-		{name: "", e: Complex64{123.456}, args: args{fmt: 'e', prec: 3}, want: String{"(1.235e+02+0.000e+00i)"}},
-		{name: "", e: Complex64{123.456}, args: args{fmt: 'e', prec: 4}, want: String{"(1.2346e+02+0.0000e+00i)"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringFmtPrec(tt.args.fmt, tt.args.prec); !got.Equal(tt.want) {
-				t.Errorf("Complex64.ToStringFmtPrec() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestComplex64_ToStringFormat(t *testing.T) {
-	type args struct {
-		format string
-	}
-	tests := []struct {
-		name string
-		e    Complex64
-		args args
-		want String
-	}{
-		{name: "", e: Complex64{123}, args: args{format: "v=%v"}, want: String{"v={(123+0i)}"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
-				t.Errorf("Complex64.ToStringFormat() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestComplex64_ToBytes(t *testing.T) {
 	tests := []struct {
 		name string
@@ -7182,6 +7075,112 @@ func TestComplex64_ToBytesFormat(t *testing.T) {
 	}
 }
 
+func TestComplex64_ToString(t *testing.T) {
+	tests := []struct {
+		name string
+		e    Complex64
+
+		want String
+	}{
+		{name: "", e: Complex64{123}, want: String{"(123+0i)"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToString(); !got.Equal(tt.want) {
+				t.Errorf("Complex64.ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestComplex64_ToStringFmt(t *testing.T) {
+	type args struct {
+		fmt byte
+	}
+	tests := []struct {
+		name string
+		e    Complex64
+		args args
+		want String
+	}{
+		{name: "", e: Complex64{123.456}, args: args{fmt: 'e'}, want: String{"(1.23456e+02+0e+00i)"}},
+		{name: "", e: Complex64{123.456}, args: args{fmt: 'E'}, want: String{"(1.23456E+02+0E+00i)"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringFmt(tt.args.fmt); !got.Equal(tt.want) {
+				t.Errorf("Complex64.ToStringFmt() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestComplex64_ToStringPrec(t *testing.T) {
+	type args struct {
+		prec int
+	}
+	tests := []struct {
+		name string
+		e    Complex64
+		args args
+		want String
+	}{
+		{name: "", e: Complex64{123.456}, args: args{prec: 3}, want: String{"(123+0i)"}},
+		{name: "", e: Complex64{123.456}, args: args{prec: 4}, want: String{"(123.5+0i)"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringPrec(tt.args.prec); !got.Equal(tt.want) {
+				t.Errorf("Complex64.ToStringPrec() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestComplex64_ToStringFmtPrec(t *testing.T) {
+	type args struct {
+		fmt  byte
+		prec int
+	}
+	tests := []struct {
+		name string
+		e    Complex64
+		args args
+		want String
+	}{
+		{name: "", e: Complex64{123.456}, args: args{fmt: 'e', prec: 3}, want: String{"(1.235e+02+0.000e+00i)"}},
+		{name: "", e: Complex64{123.456}, args: args{fmt: 'e', prec: 4}, want: String{"(1.2346e+02+0.0000e+00i)"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringFmtPrec(tt.args.fmt, tt.args.prec); !got.Equal(tt.want) {
+				t.Errorf("Complex64.ToStringFmtPrec() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestComplex64_ToStringFormat(t *testing.T) {
+	type args struct {
+		format string
+	}
+	tests := []struct {
+		name string
+		e    Complex64
+		args args
+		want String
+	}{
+		{name: "", e: Complex64{123}, args: args{format: "v=%v"}, want: String{"v={(123+0i)}"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
+				t.Errorf("Complex64.ToStringFormat() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestComplex128_Type(t *testing.T) {
 	tests := []struct {
 		name string
@@ -7192,7 +7191,7 @@ func TestComplex128_Type(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.Type(); !reflect.DeepEqual(got, tt.want) {
+			if got := tt.e.Type(); !got.Equal(tt.want) {
 				t.Errorf("Complex128.Type() = %v, want %v", got, tt.want)
 			}
 		})
@@ -7720,112 +7719,6 @@ func TestComplex128_ToComplex128Eq(t *testing.T) {
 	}
 }
 
-func TestComplex128_ToString(t *testing.T) {
-	tests := []struct {
-		name string
-		e    Complex128
-
-		want String
-	}{
-		{name: "", e: Complex128{123}, want: String{"(123+0i)"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToString(); !got.Equal(tt.want) {
-				t.Errorf("Complex128.ToString() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestComplex128_ToStringFmt(t *testing.T) {
-	type args struct {
-		fmt byte
-	}
-	tests := []struct {
-		name string
-		e    Complex128
-		args args
-		want String
-	}{
-		{name: "", e: Complex128{123.456}, args: args{fmt: 'e'}, want: String{"(1.23456e+02+0e+00i)"}},
-		{name: "", e: Complex128{123.456}, args: args{fmt: 'E'}, want: String{"(1.23456E+02+0E+00i)"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringFmt(tt.args.fmt); !got.Equal(tt.want) {
-				t.Errorf("Complex128.ToStringFmt() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestComplex128_ToStringPrec(t *testing.T) {
-	type args struct {
-		prec int
-	}
-	tests := []struct {
-		name string
-		e    Complex128
-		args args
-		want String
-	}{
-		{name: "", e: Complex128{123.456}, args: args{prec: 3}, want: String{"(123+0i)"}},
-		{name: "", e: Complex128{123.456}, args: args{prec: 4}, want: String{"(123.5+0i)"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringPrec(tt.args.prec); !got.Equal(tt.want) {
-				t.Errorf("Complex128.ToStringPrec() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestComplex128_ToStringFmtPrec(t *testing.T) {
-	type args struct {
-		fmt  byte
-		prec int
-	}
-	tests := []struct {
-		name string
-		e    Complex128
-		args args
-		want String
-	}{
-		{name: "", e: Complex128{123.456}, args: args{fmt: 'e', prec: 3}, want: String{"(1.235e+02+0.000e+00i)"}},
-		{name: "", e: Complex128{123.456}, args: args{fmt: 'e', prec: 4}, want: String{"(1.2346e+02+0.0000e+00i)"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringFmtPrec(tt.args.fmt, tt.args.prec); !got.Equal(tt.want) {
-				t.Errorf("Complex128.ToStringFmtPrec() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestComplex128_ToStringFormat(t *testing.T) {
-	type args struct {
-		format string
-	}
-	tests := []struct {
-		name string
-		e    Complex128
-		args args
-		want String
-	}{
-		{name: "", e: Complex128{123}, args: args{format: "v=%v"}, want: String{"v={(123+0i)}"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
-				t.Errorf("Complex128.ToStringFormat() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestComplex128_ToBytes(t *testing.T) {
 	tests := []struct {
 		name string
@@ -7927,6 +7820,112 @@ func TestComplex128_ToBytesFormat(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.e.ToBytesFormat(tt.args.format); !got.Equal(tt.want) {
 				t.Errorf("Complex128.ToBytesFormat() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestComplex128_ToString(t *testing.T) {
+	tests := []struct {
+		name string
+		e    Complex128
+
+		want String
+	}{
+		{name: "", e: Complex128{123}, want: String{"(123+0i)"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToString(); !got.Equal(tt.want) {
+				t.Errorf("Complex128.ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestComplex128_ToStringFmt(t *testing.T) {
+	type args struct {
+		fmt byte
+	}
+	tests := []struct {
+		name string
+		e    Complex128
+		args args
+		want String
+	}{
+		{name: "", e: Complex128{123.456}, args: args{fmt: 'e'}, want: String{"(1.23456e+02+0e+00i)"}},
+		{name: "", e: Complex128{123.456}, args: args{fmt: 'E'}, want: String{"(1.23456E+02+0E+00i)"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringFmt(tt.args.fmt); !got.Equal(tt.want) {
+				t.Errorf("Complex128.ToStringFmt() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestComplex128_ToStringPrec(t *testing.T) {
+	type args struct {
+		prec int
+	}
+	tests := []struct {
+		name string
+		e    Complex128
+		args args
+		want String
+	}{
+		{name: "", e: Complex128{123.456}, args: args{prec: 3}, want: String{"(123+0i)"}},
+		{name: "", e: Complex128{123.456}, args: args{prec: 4}, want: String{"(123.5+0i)"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringPrec(tt.args.prec); !got.Equal(tt.want) {
+				t.Errorf("Complex128.ToStringPrec() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestComplex128_ToStringFmtPrec(t *testing.T) {
+	type args struct {
+		fmt  byte
+		prec int
+	}
+	tests := []struct {
+		name string
+		e    Complex128
+		args args
+		want String
+	}{
+		{name: "", e: Complex128{123.456}, args: args{fmt: 'e', prec: 3}, want: String{"(1.235e+02+0.000e+00i)"}},
+		{name: "", e: Complex128{123.456}, args: args{fmt: 'e', prec: 4}, want: String{"(1.2346e+02+0.0000e+00i)"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringFmtPrec(tt.args.fmt, tt.args.prec); !got.Equal(tt.want) {
+				t.Errorf("Complex128.ToStringFmtPrec() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestComplex128_ToStringFormat(t *testing.T) {
+	type args struct {
+		format string
+	}
+	tests := []struct {
+		name string
+		e    Complex128
+		args args
+		want String
+	}{
+		{name: "", e: Complex128{123}, args: args{format: "v=%v"}, want: String{"v={(123+0i)}"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.ToStringFormat(tt.args.format); !got.Equal(tt.want) {
+				t.Errorf("Complex128.ToStringFormat() = %v, want %v", got, tt.want)
 			}
 		})
 	}
